@@ -1,94 +1,97 @@
 <?php
+/**
+ * Display a classified form for users to submit new classified posts.
+ *
+ * @package classifieds
+ */
 
+/**
+ * Display a classified form for users to submit new classified posts.
+ *
+ * @return string The HTML of the classified form.
+ */
 function display_classified_form() {
 	if ( 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST['submit_classified'] ) ) {
-		$nonce = $_POST['_wpnonce'];
-		if ( ! wp_verify_nonce( $nonce, 'submit_classified' ) ) {
-			die( 'Security check failed' );
-		}
+		// Check if the nonce is set and valid.
+		if ( isset( $_POST['_wpnonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['_wpnonce'] ) ), 'submit_classified' ) ) {
 
-		$classified_data = array(
-			'post_title'   => sanitize_text_field( $_POST['classified_title'] ),
-			'post_content' => sanitize_textarea_field( $_POST['classified_description'] ),
-			'post_status'  => 'pending',
-			// 'post_status'  => 'publish',
-			'post_type'    => 'classified',
-		);
+			// Sanitize and process the classified data.
+			$classified_data = array(
+				'post_title'   => isset( $_POST['classified_title'] ) ? sanitize_text_field( wp_unslash( $_POST['classified_title'] ) ) : 'Error in Title',
+				'post_content' => isset( $_POST['classified_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['classified_description'] ) ) : 'Error in Description',
+				'post_status'  => 'pending',
+				'post_type'    => 'classified',
+			);
 
-		$classified_price    = isset( $_POST['classified_price'] ) ? floatval( $_POST['classified_price'] ) : 0;
-		$classified_currency = sanitize_text_field( $_POST['classified_currency'] );
+			$classified_price    = isset( $_POST['classified_price'] ) ? floatval( wp_unslash( $_POST['classified_price'] ) ) : 0;
+			$classified_currency = sanitize_text_field( wp_unslash( $_POST['classified_currency'] ) );
+			$classified_email    = sanitize_email( wp_unslash( $_POST['classified_email'] ) );
 
-		// Verificar que el post se haya creado correctamente.
-		$classified_id = wp_insert_post( $classified_data );
+			// Insert the post.
+			$classified_id = wp_insert_post( $classified_data );
 
-		if ( $classified_id ) {
-            
-			// Asignar la categoría al post recién creado.
-            if ( isset( $_POST['classified_category'] ) && ! empty( $_POST['classified_category'] ) ) {
-				$categories = array_map( 'intval', $_POST['classified_category'] );
-				wp_set_post_terms( $classified_id, $categories, 'classified_category' );  // Asigna las categorías
-			}
+			if ( $classified_id ) {
 
-			// Guardar el precio del Clasificado como meta.
-			update_post_meta( $classified_id, '_classified_price', $classified_price );
-
-			// Guardar la moneda seleccionada como un custom field
-			update_post_meta( $classified_id, '_classified_currency', $classified_currency );
-
-			// Manejar las imágenes.
-			if ( ! empty( $_FILES['classified_images']['name'][0] ) ) {
-				$image_ids = array(); // Arreglo para almacenar los IDs de las imágenes subidas.
-
-				// Limitar a 5 imágenes
-				$image_count = count( $_FILES['classified_images']['name'] );
-				if ( $image_count > 5 ) {
-					$image_count = 5; // Limitar a máximo 5 imágenes.
+				// Assign the category.
+				if ( isset( $_POST['classified_category'] ) && ! empty( $_POST['classified_category'] ) ) {
+					$categories = array_map( 'intval', wp_unslash( $_POST['classified_category'] ) );
+					wp_set_post_terms( $classified_id, $categories, 'classified_category' );
 				}
 
-				for ( $i = 0; $i < $image_count; $i++ ) {
-					// Subir cada imagen.
-					$file = array(
-						'name'     => $_FILES['classified_images']['name'][ $i ],
-						'type'     => $_FILES['classified_images']['type'][ $i ],
-						'tmp_name' => $_FILES['classified_images']['tmp_name'][ $i ],
-						'error'    => $_FILES['classified_images']['error'][ $i ],
-						'size'     => $_FILES['classified_images']['size'][ $i ],
-					);
+				// Save custom fields.
+				update_post_meta( $classified_id, '_classified_price', $classified_price );
+				update_post_meta( $classified_id, '_classified_currency', $classified_currency );
+				update_post_meta( $classified_id, '_classified_email', $classified_email );
 
-					// Subir la imagen usando wp_handle_upload.
-					$upload_overrides = array( 'test_form' => false );
-					$movefile         = wp_handle_upload( $file, $upload_overrides );
+				// Handle images.
+				if ( ! empty( $_FILES['classified_images']['name'][0] ) ) {
+					$image_ids   = array();
+					$image_count = count( $_FILES['classified_images']['name'] );
 
-					if ( $movefile && ! isset( $movefile['error'] ) ) {
-						// La imagen fue subida exitosamente, ahora la asociamos al post.
-						$attachment = array(
-							'post_mime_type' => $movefile['type'],
-							'post_title'     => sanitize_file_name( $movefile['file'] ),
-							'post_content'   => '',
-							'post_status'    => 'inherit',
+					if ( $image_count > 5 ) {
+						$image_count = 5;
+					}
+
+					for ( $i = 0; $i < $image_count; $i++ ) {
+						$file = array(
+							'name'     => $_FILES['classified_images']['name'][ $i ],
+							'type'     => $_FILES['classified_images']['type'][ $i ],
+							'tmp_name' => $_FILES['classified_images']['tmp_name'][ $i ],
+							'error'    => $_FILES['classified_images']['error'][ $i ],
+							'size'     => $_FILES['classified_images']['size'][ $i ],
 						);
 
-						$attachment_id = wp_insert_attachment( $attachment, $movefile['file'], $classified_id );
+						$upload_overrides = array( 'test_form' => false );
+						$movefile         = wp_handle_upload( $file, $upload_overrides );
 
-						// Generar los metadatos de la imagen.
-						require_once ABSPATH . 'wp-admin/includes/image.php';
-						$attach_data = wp_generate_attachment_metadata( $attachment_id, $movefile['file'] );
-						wp_update_attachment_metadata( $attachment_id, $attach_data );
+						if ( $movefile && ! isset( $movefile['error'] ) ) {
+							$attachment = array(
+								'post_mime_type' => $movefile['type'],
+								'post_title'     => sanitize_file_name( $movefile['file'] ),
+								'post_content'   => '',
+								'post_status'    => 'inherit',
+							);
 
-						// Añadir el ID de la imagen al array de imágenes.
-						$image_ids[] = $attachment_id;
+							$attachment_id = wp_insert_attachment( $attachment, $movefile['file'], $classified_id );
+							require_once ABSPATH . 'wp-admin/includes/image.php';
+							$attach_data = wp_generate_attachment_metadata( $attachment_id, $movefile['file'] );
+							wp_update_attachment_metadata( $attachment_id, $attach_data );
+							$image_ids[] = $attachment_id;
+						}
+					}
+
+					if ( ! empty( $image_ids ) ) {
+						update_post_meta( $classified_id, '_classified_images', $image_ids );
 					}
 				}
 
-				// Guardar los IDs de las imágenes como meta en el post.
-				if ( ! empty( $image_ids ) ) {
-					update_post_meta( $classified_id, '_classified_images', $image_ids );
-				}
+				echo '<p>¡Tu Clasificado se ha creado correctamente!</p>';
+			} else {
+				echo '<p>Hubo un error procesando tu Clasificado. Por favor, refresca la página e intentalo nuevamente.</p>';
 			}
-
-			echo '<p>¡Tu Clasificado se ha creado correctamente!</p>';
 		} else {
-			echo '<p>Hubo un error procesando tu Clasificado. Por favor, refresca la página e intentalo nuevamente.</p>';
+			// Nonce verification failed.
+			echo '<p>Error de seguridad: El formulario no pudo ser procesado.</p>';
 		}
 	}
 
@@ -126,36 +129,17 @@ function display_classified_form() {
 
 		<label for="classified_category">Categoria</label>
 		<?php
-
 		foreach ( $categories as $category ) {
 			?>
 			<input type="checkbox" name="classified_category[]" value="<?php echo esc_attr( $category->term_id ); ?>">
 			<?php echo esc_html( $category->name ); ?>
 		<?php } ?>
 
+		<label for="classified_email">Correo electrónico</label>
+		<input type="email" id="classified_email" name="classified_email" required />
+
 		<input type="submit" name="submit_classified" value="Enviar Clasificado">
 	</form>
-
-	<!-- <script type="text/javascript">
-		document.getElementById('classifiedForm').addEventListener('submit', function(event) {
-			event.preventDefault(); // Evita el envío del formulario
-
-			// Capturar datos del formulario
-			var formData = new FormData(event.target);
-			var formObject = {};
-			formData.forEach((value, key) => {
-				formObject[key] = value
-			});
-
-			// Mostrar los datos capturados en la consola
-			console.log('Form Data:', formObject);
-
-			// Mostrar los datos capturados en el HTML (opcional)
-			var resultDiv = document.createElement('div');
-			resultDiv.innerHTML = '<pre>' + JSON.stringify(formObject, null, 4) + '</pre>';
-			document.body.appendChild(resultDiv);
-		});
-	</script> -->
 
 	<?php
 	return ob_get_clean();

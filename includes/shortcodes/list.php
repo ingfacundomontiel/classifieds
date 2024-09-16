@@ -30,7 +30,7 @@ function display_classifieds_list( $atts ) {
 					?>
 					<div class="price">
 
-						<p><strong>Precio: </strong> $<?php echo ( $currency === 'USD' ) ? 'USD$ ' : 'ARS$ ', esc_html( $price ); ?> </p>
+						<p><strong>Precio: </strong> $<?php echo ( 'USD' === $currency ) ? 'USD$ ' : 'ARS$ ', esc_html( $price ); ?> </p>
 
 					</div>
 					<?php

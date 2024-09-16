@@ -39,3 +39,5 @@ require plugin_dir_path( __FILE__ ) . 'meta-boxes/price.php';
 require plugin_dir_path( __FILE__ ) . 'meta-boxes/images.php';
 
 require plugin_dir_path( __FILE__ ) . 'meta-boxes/currency.php';
+
+require plugin_dir_path( __FILE__ ) . 'meta-boxes/email.php';

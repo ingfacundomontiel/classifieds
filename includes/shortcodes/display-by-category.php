@@ -1,4 +1,10 @@
 <?php
+/**
+ * Display classifieds by category
+ *
+ * @package classifieds
+ */
+
 // Display classifieds by category
 
 function display_classifieds_by_category( $atts ) {
