@@ -47,7 +47,7 @@ register_deactivation_hook( __FILE__, 'classifieds_plugin_deactivate' ); // Hook
  * @return void
  */
 function classifieds_plugin_enqueue_styles() {
-	wp_enqueue_style( 'classifieds-styles', plugin_dir_url( __FILE__ ) . 'css/classifieds-styles.css' ); // Enqueue the plugin's CSS file.
+	wp_enqueue_style( 'classifieds-styles', plugin_dir_url( __FILE__ ) . 'dist/main.min.css' ); // Enqueue the plugin's CSS file.
 }
 add_action( 'wp_enqueue_scripts', 'classifieds_plugin_enqueue_styles' ); // Hook the styles to be enqueued on the frontend.
 

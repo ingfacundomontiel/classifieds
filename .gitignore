@@ -1,0 +1,34 @@
+# Ignorar node_modules (dependencias instaladas por npm)
+node_modules/
+
+# Ignorar archivos de log
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignorar archivos del sistema (macOS)
+.DS_Store
+
+# Ignorar archivos de configuración del sistema operativo
+Thumbs.db
+Desktop.ini
+
+# Ignorar configuraciones locales de IDEs/editores
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignorar archivos de configuración de Git
+/.git
+
+# Ignorar archivos temporales de Sass
+.sass-cache/
+
+# Ignorar archivos relacionados con el despliegue (opcional)
+deploy/
+build/
+
+# Ignorar dependencias de Composer si usas PHP (opcional para WordPress)
+vendor/
