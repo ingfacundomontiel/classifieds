@@ -1,0 +1,41 @@
+// Classified form styles
+.classified-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid $border-color;
+    border-radius: 5px;
+    background-color: $background-color;
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    textarea,
+    input[type="file"] {
+        width: 100%;
+        padding: $input-padding;
+        margin-bottom: 10px;
+        border: 1px solid $border-color;
+        border-radius: $border-radius;
+    }
+
+    textarea {
+        min-height: 200px;
+        background: #fff;
+    }
+
+    input[type="submit"] {
+        background-color: $primary-color;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: $border-radius;
+        cursor: pointer;
+        display: block;
+        margin-top: 10px;
+    }
+}

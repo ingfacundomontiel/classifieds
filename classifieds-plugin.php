@@ -13,11 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-// Include necessary files.
-require_once plugin_dir_path( __FILE__ ) . 'includes/post-types.php'; // Include the file that registers post types.
-require_once plugin_dir_path( __FILE__ ) . 'includes/taxonomies.php'; // Include the file that registers taxonomies.
-require_once plugin_dir_path( __FILE__ ) . 'includes/shortcodes.php'; // Include the file that registers shortcodes.
-
 /**
  * Function to activate the Classifieds Plugin.
  * This function is triggered on plugin activation to create the post type and flush rewrite rules.
@@ -41,35 +36,14 @@ function classifieds_plugin_deactivate() {
 }
 register_deactivation_hook( __FILE__, 'classifieds_plugin_deactivate' ); // Hook the deactivation function to the plugin deactivation.
 
-/**
- * Enqueue the Classifieds plugin's stylesheets.
- *
- * @return void
- */
-function classifieds_plugin_enqueue_styles() {
-	wp_enqueue_style( 'classifieds-styles', plugin_dir_url( __FILE__ ) . 'dist/main.min.css' ); // Enqueue the plugin's CSS file.
-}
-add_action( 'wp_enqueue_scripts', 'classifieds_plugin_enqueue_styles' ); // Hook the styles to be enqueued on the frontend.
+// Include necessary files.
+require_once plugin_dir_path( __FILE__ ) . 'includes/post-types.php'; // Include the file that registers post types.
+require_once plugin_dir_path( __FILE__ ) . 'includes/taxonomies.php'; // Include the file that registers taxonomies.
+require_once plugin_dir_path( __FILE__ ) . 'includes/shortcodes.php'; // Include the file that registers shortcodes.
 
-/**
- * Hook to load a custom template for the "classified" CPT from the plugin directory.
- * This function overrides the default template and loads the one located in the plugin.
- *
- * @param string $template The path to the template.
- * @return string The path to the custom template if it exists, or the original template.
- */
-function classified_custom_template( $template ) {
-	if ( is_singular( 'classified' ) ) {
-		// Define the path to the custom template inside the plugin directory.
-		$plugin_template = plugin_dir_path( __FILE__ ) . 'single-classified.php';
 
-		// Check if the file exists, and if so, load it.
-		if ( file_exists( $plugin_template ) ) {
-			return $plugin_template;
-		}
-	}
+// Include Functions.
 
-	// If not a classified CPT, return the original template.
-	return $template;
-}
-add_filter( 'template_include', 'classified_custom_template' ); // Hook to load the custom template for Classifieds.
+require_once plugin_dir_path( __FILE__ ) . 'functions/enqueue-assets.php'; // Include the file that enqueues the assets.
+require_once plugin_dir_path( __FILE__ ) . 'functions/custom-template.php'; // Include the file that loads the custom template.
+require_once plugin_dir_path( __FILE__ ) . 'functions/print-classified-categories.php'; // Include the file that prints the categories.

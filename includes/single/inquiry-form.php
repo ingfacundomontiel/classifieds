@@ -63,7 +63,7 @@ if ( 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST['submit_inquiry'] ) 
 }
 ?>
 
-<h3>Contacta al Propietario</h3>
+<h3>Contacta al Vendedor</h3>
 <form method="post" action="">
 	<?php wp_nonce_field( 'send_inquiry' ); ?>
 
