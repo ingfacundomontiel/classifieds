@@ -38,7 +38,7 @@ get_header();
 								if ( ! empty( $price ) ) {
 									?>
 									<div class="price">
-										<p><strong>Precio: </strong> $<?php echo ( 'USD' === $currency ) ? 'USD$ ' : 'ARS$ ', esc_html( $price ); ?> </p>
+										<p><strong>Precio: </strong><?php echo ( 'USD' === $currency ) ? 'USD$ ' : 'ARS$ ', esc_html( $price ); ?> </p>
 									</div>
 									<?php
 								}
