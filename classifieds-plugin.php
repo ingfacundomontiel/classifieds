@@ -3,7 +3,7 @@
  * Plugin Name: Classifieds Plugin
  * Description: A plugin to add classifieds functionality to your WordPress site.
  * Version: 1.0
- * Author: Facundo Montiel
+ * Author: Facundo Montiel - Faca
  *
  * @package classifieds
  */
