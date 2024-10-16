@@ -10,9 +10,9 @@
  *
  * @param int    $post_id The ID of the post.
  * @param string $taxonomy The taxonomy slug (e.g., 'category', 'tag', 'classified_category').
- * @param string $error_message Optional. Custom message to display if no terms are found. Default is 'No terms found.'.
+ * @param string $error_message Optional. Custom message to display if no terms are found. Default is ''.
  */
-function display_post_terms( $post_id, $taxonomy, $error_message = 'No terms found.' ) {
+function display_post_terms( $post_id, $taxonomy, $error_message = '' ) {
 	// Get the terms of the specified taxonomy for the given post.
 	$terms = get_the_terms( $post_id, $taxonomy );
 

@@ -1,42 +1,66 @@
-// Classified list styles
-.classified-list {
-    margin: 20px 0;
+.classified-list-wrapper {
+    .container {
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 0;
+        padding-right: 0;
 
-    .classified {
-        border-bottom: 1px solid lighten($border-color, 10%);
-        padding: 10px 0;
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        padding: 30px 0;
+        .classified-list {
+            margin: 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
 
+            .classified {
+                flex: 0 1 calc(33.333% - 25px);
+                border-bottom: 1px solid lighten($border-color, 10%);
+                padding: 10px 5px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
 
-        * {
-            margin: 0;
-        }
+                &.permalink {
+                    text-decoration: none;
+                }
 
-        h2 {
-            a {
-                text-decoration: none;
+                * {
+                    margin: 0;
+                }
+
+                .featured-image-wrapper {
+                    .featured-image {
+                        border-radius: 5px;
+                    }
+                }
+
+                .price {
+                    font-size: 1em;
+                    font-weight: 600;
+                }
+
+                .title {
+                    font-size: 1.2em;
+                    font-weight: 600;
+                }
+
+                .content {
+                    font-size: 1em;
+                }
+
+                .categories {
+                    font-size: 0.8em;
+                }
             }
 
-            margin: 0 0 10px;
-        }
+            @media (max-width: 992px) {
+                .classified {
+                    flex: 1 1 calc(50% - 20px);
+                }
+            }
 
-        img {
-            max-width: 150px;
-            height: auto;
-        }
-
-        .classified-gallery {
-            .gallery-wrapper {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 10px;
-                align-items: center;
-
-                img {
-                    border-radius: 10px;
+            @media (max-width: 768px) {
+                .classified {
+                    flex: 1 1 calc(100% - 20px);
                 }
             }
         }

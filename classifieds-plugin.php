@@ -47,3 +47,5 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/shortcodes.php'; // Include
 require_once plugin_dir_path( __FILE__ ) . 'functions/enqueue-assets.php'; // Include the file that enqueues the assets.
 require_once plugin_dir_path( __FILE__ ) . 'functions/custom-template.php'; // Include the file that loads the custom template.
 require_once plugin_dir_path( __FILE__ ) . 'functions/print-classified-categories.php'; // Include the file that prints the categories.
+require_once plugin_dir_path( __FILE__ ) . 'functions/custom-excerpt.php'; // Include the file that customizes excerpts.
+require_once plugin_dir_path( __FILE__ ) . 'functions/featured-image.php'; // Include the file that sets the featured image from the gallery.
