@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Shortcode to display a list of classified posts.
  *
