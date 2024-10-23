@@ -18,6 +18,8 @@ get_header();
 			$price     = get_post_meta( get_the_ID(), '_classified_price', true );
 			$currency  = get_post_meta( get_the_ID(), '_classified_currency', true );
 			$image_ids = get_post_meta( get_the_ID(), '_classified_images', true );
+			$whatsapp_number = get_post_meta( get_the_ID(), '_classified_whatsapp', true );
+
 			?>
 			<section class="block the-content">
 				<div class="container">
@@ -78,9 +80,30 @@ get_header();
 								?>
 							</div>
 
-							<?php
-							require plugin_dir_path( __FILE__ ) . 'includes/single/inquiry-form.php';
-							?>
+							<!-- Accordion for inquiry form -->
+							<div class="accordion" id="inquiryAccordion">
+								<div class="accordion-item">
+									<h2 class="accordion-header" id="headingOne">
+										<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+											Preguntar
+										</button>
+									</h2>
+									<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#inquiryAccordion">
+										<div class="accordion-body">
+											<?php require plugin_dir_path( __FILE__ ) . 'includes/single/inquiry-form.php'; ?>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- WhatsApp button -->
+							<?php if ( ! empty( $whatsapp_number ) ) : ?>
+								<div class="whatsapp-button">
+									<a href="https://wa.me/<?php echo esc_attr( $whatsapp_number ); ?>" target="_blank" class="btn btn-success">
+										Contactar por WhatsApp
+									</a>
+								</div>
+							<?php endif; ?>
 
 						</div> <!-- .content-col -->
 					</div><!-- .row -->
