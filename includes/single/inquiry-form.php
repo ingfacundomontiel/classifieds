@@ -65,7 +65,7 @@ if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'
 }
 ?>
 
-<h4>Contacta al Vendedor</h4>
+<h4 class="form-title">Contacta al Vendedor</h4>
 <form method="post" action="">
 	<?php wp_nonce_field( 'send_inquiry' ); ?>
 

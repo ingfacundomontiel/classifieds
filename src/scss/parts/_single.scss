@@ -64,6 +64,11 @@
 
                         .accordion-button {
                             cursor: pointer;
+                            background: transparent;
+                            padding: 16px 20px;
+                            text-transform: none;
+                            color: #000;
+                            font-weight: 400;
 
                             &:not(.collapsed) {
                                 background-color: rgba(152, 192, 31, 0.5);
@@ -74,6 +79,22 @@
                             &:hover {
                                 background-color: rgba(152, 192, 31, 0.5);
                             }
+
+                            &:focus {
+                                box-shadow: none;
+                            }
+                        }
+                    }
+
+                    .form-title {
+                        margin-bottom: 10px;
+                    }
+
+                    form {
+
+                        input {
+                            width: 100%;
+                            margin-top: 5px;
                         }
                     }
                 }
@@ -88,6 +109,9 @@
                 display: flex;
                 align-items: center;
                 gap: 15px;
+                text-transform: none;
+                color: #000;
+                font-weight: 400;
 
                 &:hover {
                     background-color: rgba(152, 192, 31, 0.5);

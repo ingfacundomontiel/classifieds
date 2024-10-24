@@ -84,11 +84,11 @@ get_header();
 							<!-- Accordion for inquiry form -->
 							<div class="accordion" id="inquiryAccordion">
 								<div class="accordion-item">
-									<h2 class="accordion-header" id="heading-1">
+									<span class="accordion-header" id="heading-1">
 										<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
 											Preguntar
 										</button>
-									</h2>
+									</span>
 									<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="heading-1" data-bs-parent="#inquiryAccordion">
 										<div class="accordion-body">
 											<?php require plugin_dir_path(__FILE__) . 'includes/single/inquiry-form.php'; ?>
@@ -103,7 +103,7 @@ get_header();
 									<span>Contactar por WhatsApp</span>
 									<img src="<?php echo plugin_dir_url(__FILE__) ?>src/img/whatsapp.svg" alt="WhatsApp Icon" class="whatsapp-icon">
 								</a>
-								
+
 							<?php endif; ?>
 
 						</div> <!-- .content-col -->
