@@ -57,39 +57,44 @@
             #inquiryAccordion {
                 .accordion-item {
                     border: 1px solid #4c9127;
+                    background-color: transparent;
 
-                    .accordion-button {
-                        cursor: pointer;
+                    .accordion-header {
+                        padding-bottom: 0;
 
-                        &:not(.collapsed) {
-                            background-color: rgba(152, 192, 31, 0.5);
-                            color: #000;
+                        .accordion-button {
+                            cursor: pointer;
 
-                        }
+                            &:not(.collapsed) {
+                                background-color: rgba(152, 192, 31, 0.5);
+                                color: #000;
 
-                        &:hover {
-                            background-color: rgba(152, 192, 31, 0.5);
+                            }
+
+                            &:hover {
+                                background-color: rgba(152, 192, 31, 0.5);
+                            }
                         }
                     }
                 }
-            }
 
-            .btn-whatsapp {
-                padding: 16px 20px;
-                border: 1px solid #4c9127;
-                border-radius: 5px;
-                text-decoration: none;
-                transition: .5s all ease-in-out;
-                display: flex;
-                align-items: center;
-                gap: 15px;
+                .btn-whatsapp {
+                    padding: 16px 20px;
+                    border: 1px solid #4c9127;
+                    border-radius: 5px;
+                    text-decoration: none;
+                    transition: .5s all ease-in-out;
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
 
-                &:hover {
-                    background-color: rgba(152, 192, 31, 0.5);
-                }
+                    &:hover {
+                        background-color: rgba(152, 192, 31, 0.5);
+                    }
 
-                .whatsapp-icon {
-                    max-width: 25px;
+                    .whatsapp-icon {
+                        max-width: 25px;
+                    }
                 }
             }
         }
