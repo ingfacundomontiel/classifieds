@@ -15,83 +15,67 @@ function display_classified_form() {
 		// Check if the nonce is set and valid.
 		if ( isset( $_POST['_wpnonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['_wpnonce'] ) ), 'submit_classified' ) ) {
 
-			// Sanitize and process the classified data.
-			$classified_data = array(
-				'post_title'   => isset( $_POST['classified_title'] ) ? sanitize_text_field( wp_unslash( $_POST['classified_title'] ) ) : 'Error in Title',
-				'post_content' => isset( $_POST['classified_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['classified_description'] ) ) : 'Error in Description',
-				'post_status'  => 'pending',
-				'post_type'    => 'classified',
-			);
+			// Initialize an array to store validation errors.
+			$form_errors = array();
 
-			$classified_price    = isset( $_POST['classified_price'] ) ? floatval( wp_unslash( $_POST['classified_price'] ) ) : 0;
-			$classified_currency = sanitize_text_field( wp_unslash( $_POST['classified_currency'] ) );
-			$classified_email    = sanitize_email( wp_unslash( $_POST['classified_email'] ) );
+			// Check required fields.
+			if ( empty( $_POST['classified_title'] ) ) {
+				$form_errors[] = 'El título es obligatorio.';
+			}
+			if ( empty( $_POST['classified_price'] ) ) {
+				$form_errors[] = 'El precio es obligatorio.';
+			}
+			if ( empty( $_POST['classified_currency'] ) ) {
+				$form_errors[] = 'Debes seleccionar una moneda.';
+			}
+			if ( empty( $_POST['classified_category'] ) ) {
+				$form_errors[] = 'Debes seleccionar al menos una categoría.';
+			}
+			if ( empty( $_POST['classified_user_type'] ) ) {
+				$form_errors[] = 'Debes seleccionar si eres Productor o Comercio.';
+			}
 
-			// Insert the post.
-			$classified_id = wp_insert_post( $classified_data );
+			// Display errors if any
+			if ( ! empty( $form_errors ) ) {
+				foreach ( $form_errors as $error ) {
+					echo '<p style="color: red; background-color: #fffacd;">' . esc_html( $error ) . '</p>';
+				}
+			} else {
+				// Sanitize and process the classified data if no errors.
+				$classified_data = array(
+					'post_title'   => sanitize_text_field( wp_unslash( $_POST['classified_title'] ) ),
+					'post_content' => sanitize_textarea_field( wp_unslash( $_POST['classified_description'] ) ),
+					'post_status'  => 'pending',
+					'post_type'    => 'classified',
+				);
 
-			if ( $classified_id ) {
+				$classified_price    = floatval( wp_unslash( $_POST['classified_price'] ) );
+				$classified_currency = sanitize_text_field( wp_unslash( $_POST['classified_currency'] ) );
+				$classified_email    = sanitize_email( wp_unslash( $_POST['classified_email'] ) );
+				$classified_user_type = sanitize_text_field( wp_unslash( $_POST['classified_user_type'] ) );
 
-				// Assign the category.
-				if ( isset( $_POST['classified_category'] ) && ! empty( $_POST['classified_category'] ) ) {
+				// Insert the post.
+				$classified_id = wp_insert_post( $classified_data );
+
+				if ( $classified_id ) {
+					// Assign the category.
 					$categories = array_map( 'intval', wp_unslash( $_POST['classified_category'] ) );
 					wp_set_post_terms( $classified_id, $categories, 'classified_category' );
+
+					// Save custom fields.
+					update_post_meta( $classified_id, '_classified_price', $classified_price );
+					update_post_meta( $classified_id, '_classified_currency', $classified_currency );
+					update_post_meta( $classified_id, '_classified_email', $classified_email );
+					update_post_meta( $classified_id, '_classified_user_type', $classified_user_type );
+
+					echo '<p style="background-color: #fffacd;">¡Tu Clasificado se ha creado correctamente!</p>';
+				} else {
+					echo '<p style="background-color: #fffacd;">Hubo un error procesando tu Clasificado. Por favor, refresca la página e intentalo nuevamente.</p>';
 				}
-
-				// Save custom fields.
-				update_post_meta( $classified_id, '_classified_price', $classified_price );
-				update_post_meta( $classified_id, '_classified_currency', $classified_currency );
-				update_post_meta( $classified_id, '_classified_email', $classified_email );
-
-				// Handle images.
-				if ( ! empty( $_FILES['classified_images']['name'][0] ) ) {
-					$image_ids   = array();
-					$image_count = count( $_FILES['classified_images']['name'] );
-
-					if ( $image_count > 5 ) {
-						$image_count = 5;
-					}
-
-					for ( $i = 0; $i < $image_count; $i++ ) {
-						$file = array(
-							'name'     => $_FILES['classified_images']['name'][ $i ],
-							'type'     => $_FILES['classified_images']['type'][ $i ],
-							'tmp_name' => $_FILES['classified_images']['tmp_name'][ $i ],
-							'error'    => $_FILES['classified_images']['error'][ $i ],
-							'size'     => $_FILES['classified_images']['size'][ $i ],
-						);
-
-						$upload_overrides = array( 'test_form' => false );
-						$movefile         = wp_handle_upload( $file, $upload_overrides );
-
-						if ( $movefile && ! isset( $movefile['error'] ) ) {
-							$attachment = array(
-								'post_mime_type' => $movefile['type'],
-								'post_title'     => sanitize_file_name( $movefile['file'] ),
-								'post_content'   => '',
-								'post_status'    => 'inherit',
-							);
-
-							$attachment_id = wp_insert_attachment( $attachment, $movefile['file'], $classified_id );
-							require_once ABSPATH . 'wp-admin/includes/image.php';
-							$attach_data = wp_generate_attachment_metadata( $attachment_id, $movefile['file'] );
-							wp_update_attachment_metadata( $attachment_id, $attach_data );
-							$image_ids[] = $attachment_id;
-						}
-					}
-
-					if ( ! empty( $image_ids ) ) {
-						update_post_meta( $classified_id, '_classified_images', $image_ids );
-					}
-				}
-
-				echo '<p>¡Tu Clasificado se ha creado correctamente!</p>';
-			} else {
-				echo '<p>Hubo un error procesando tu Clasificado. Por favor, refresca la página e intentalo nuevamente.</p>';
 			}
 		} else {
 			// Nonce verification failed.
-			echo '<p>Error de seguridad: El formulario no pudo ser procesado.</p>';
+			echo '<p style="background-color: #fffacd;">Error de seguridad: El formulario no pudo ser procesado.</p>';
 		}
 	}
 
@@ -137,6 +121,16 @@ function display_classified_form() {
 
 		<label for="classified_email">Correo electrónico</label>
 		<input type="email" id="classified_email" name="classified_email" required />
+
+		<!-- New section for user type -->	
+		<div class="classified-user-type-wrapper">
+			<label>Soy:</label><br>
+			<input type="radio" id="productor" name="classified_user_type" value="Productor" required>
+			<label for="productor">Productor</label><br>
+
+			<input type="radio" id="comercio" name="classified_user_type" value="Comercio" required>
+			<label for="comercio">Comercio</label><br><br>
+		</div>
 
 		<input type="submit" name="submit_classified" value="Enviar Clasificado">
 	</form>
