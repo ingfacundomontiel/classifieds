@@ -1,5 +1,5 @@
 // Classified form styles
-.classified-form {
+.classified-input-form {
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
@@ -7,25 +7,43 @@
     border-radius: 5px;
     background-color: $background-color;
 
-    label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: bold;
+    .classified-form-group {
+        margin-bottom: 20px;
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        input[type="file"],
+        textarea {
+            width: 100%;
+            padding: $input-padding;
+            border: 1px solid $border-color;
+            border-radius: $border-radius;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            min-height: 200px;
+            background: #fff;
+        }
+
+        // Special instructions for WhatsApp field description
+        .whatsapp-field {
+            font-size: 0.875em;
+            color: #666;
+            margin-top: -8px;
+        }
     }
 
-    input[type="text"],
-    textarea,
-    input[type="file"] {
-        width: 100%;
-        padding: $input-padding;
-        margin-bottom: 10px;
-        border: 1px solid $border-color;
-        border-radius: $border-radius;
-    }
-
-    textarea {
-        min-height: 200px;
-        background: #fff;
+    input[type="radio"],
+    input[type="checkbox"] {
+        margin-right: 8px;
     }
 
     input[type="submit"] {

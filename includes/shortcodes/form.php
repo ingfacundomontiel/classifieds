@@ -5,11 +5,6 @@
  * @package classifieds
  */
 
-/**
- * Display a classified form for users to submit new classified posts.
- *
- * @return string The HTML of the classified form.
- */
 function display_classified_form() {
 	if ( 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST['submit_classified'] ) ) {
 		// Check if the nonce is set and valid.
@@ -53,6 +48,7 @@ function display_classified_form() {
 				$classified_currency = sanitize_text_field( wp_unslash( $_POST['classified_currency'] ) );
 				$classified_email    = sanitize_email( wp_unslash( $_POST['classified_email'] ) );
 				$classified_user_type = sanitize_text_field( wp_unslash( $_POST['classified_user_type'] ) );
+				$classified_whatsapp = sanitize_text_field( wp_unslash( $_POST['classified_whatsapp'] ) );
 
 				// Insert the post.
 				$classified_id = wp_insert_post( $classified_data );
@@ -67,6 +63,7 @@ function display_classified_form() {
 					update_post_meta( $classified_id, '_classified_currency', $classified_currency );
 					update_post_meta( $classified_id, '_classified_email', $classified_email );
 					update_post_meta( $classified_id, '_classified_user_type', $classified_user_type );
+					update_post_meta( $classified_id, '_classified_whatsapp', $classified_whatsapp );
 
 					echo '<p style="background-color: #fffacd;">¡Tu Clasificado se ha creado correctamente!</p>';
 				} else {
@@ -90,49 +87,71 @@ function display_classified_form() {
 	ob_start();
 	?>
 
-	<form id="classifiedForm" action="" method="post" enctype="multipart/form-data" class="classified-form">
+	<form id="classifiedForm" action="" method="post" enctype="multipart/form-data" class="classified-input-form">
 		<?php wp_nonce_field( 'submit_classified' ); ?>
-		<label for="classified_title">Título</label>
-		<input type="text" id="classified_title" name="classified_title" required>
+		
+		<div class="classified-form-group">
+			<label for="classified_title">Título</label>
+			<input type="text" id="classified_title" name="classified_title" required>
+		</div>
 
-		<label for="classified_description">Descripción</label>
-		<textarea id="classified_description" name="classified_description" required></textarea>
+		<div class="classified-form-group">
+			<label for="classified_description">Descripción</label>
+			<textarea id="classified_description" name="classified_description" required></textarea>
+		</div>
 
-		<label for="classified_price">Precio</label>
-		<input type="number" id="classified_price" name="classified_price" required>
+		<div class="classified-form-group">
+			<label for="classified_price">Precio</label>
+			<input type="number" id="classified_price" name="classified_price" required>
+		</div>
 
-		<label for="currency">Moneda:</label>
-		<input type="radio" id="currency_ars" name="classified_currency" value="ARS" required />
-		<label for="currency_ars">Pesos Argentinos</label>
+		<div class="classified-form-group">
+			<label for="currency">Moneda:</label>
+			<input type="radio" id="currency_ars" name="classified_currency" value="ARS" required />
+			<label for="currency_ars">Pesos Argentinos</label>
 
-		<input type="radio" id="currency_usd" name="classified_currency" value="USD" required />
-		<label for="currency_usd">USD</label>
+			<input type="radio" id="currency_usd" name="classified_currency" value="USD" required />
+			<label for="currency_usd">USD</label>
+		</div>
 
-		<label for="classified_images">Imágenes (hasta 5):</label>
-		<input type="file" id="classified_images" name="classified_images[]" multiple="multiple" accept="image/*" />
+		<div class="classified-form-group">
+			<label for="classified_images">Imágenes (hasta 5):</label>
+			<input type="file" id="classified_images" name="classified_images[]" multiple="multiple" accept="image/*" />
+		</div>
 
-		<label for="classified_category">Categoria</label>
-		<?php
-		foreach ( $categories as $category ) {
-			?>
-			<input type="checkbox" name="classified_category[]" value="<?php echo esc_attr( $category->term_id ); ?>">
-			<?php echo esc_html( $category->name ); ?>
-		<?php } ?>
+		<div class="classified-form-group">
+			<label for="classified_category">Categoría</label>
+			<?php
+			foreach ( $categories as $category ) {
+				?>
+				<input type="checkbox" name="classified_category[]" value="<?php echo esc_attr( $category->term_id ); ?>">
+				<?php echo esc_html( $category->name ); ?>
+			<?php } ?>
+		</div>
 
-		<label for="classified_email">Correo electrónico</label>
-		<input type="email" id="classified_email" name="classified_email" required />
+		<div class="classified-form-group">
+			<label for="classified_email">Correo electrónico</label>
+			<input type="email" id="classified_email" name="classified_email" required>
+		</div>
 
-		<!-- New section for user type -->	
-		<div class="classified-user-type-wrapper">
+		<div class="classified-form-group">
+			<label for="classified_whatsapp">Número de WhatsApp:</label>
+			<input type="text" id="classified_whatsapp" name="classified_whatsapp" placeholder="Ej: 5491166667777" required>
+			<p class="field-description whatsapp-field">Introduce el número de WhatsApp con código de país, sin espacios ni guiones. Ejemplo: 5491166667777</p>
+		</div>
+
+		<div class="classified-form-group classified-user-type-wrapper">
 			<label>Soy:</label><br>
 			<input type="radio" id="productor" name="classified_user_type" value="Productor" required>
 			<label for="productor">Productor</label><br>
 
 			<input type="radio" id="comercio" name="classified_user_type" value="Comercio" required>
-			<label for="comercio">Comercio</label><br><br>
+			<label for="comercio">Comercio</label>
 		</div>
 
-		<input type="submit" name="submit_classified" value="Enviar Clasificado">
+		<div class="classified-form-group">
+			<input type="submit" name="submit_classified" value="Enviar Clasificado">
+		</div>
 	</form>
 
 	<?php
