@@ -34,7 +34,6 @@ function classifieds_user_type_box_html( $post ) {
 
     // Display radio buttons for user type selection
     ?>
-    <label for="classified_user_type">Soy:</label><br>
     <input type="radio" id="productor" name="classified_user_type" value="Productor" <?php checked( $user_type, 'Productor' ); ?> />
     <label for="productor">Productor</label><br>
 

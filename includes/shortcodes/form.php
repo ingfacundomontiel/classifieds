@@ -5,6 +5,9 @@
  * @package classifieds
  */
 
+// Include the classified fields configuration file.
+// include_once plugin_dir_path( __DIR__ ) . '../classified-fields.php';
+
 function display_classified_form() {
 	if ( 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST['submit_classified'] ) ) {
 		// Check if the nonce is set and valid.
@@ -29,6 +32,9 @@ function display_classified_form() {
 			if ( empty( $_POST['classified_user_type'] ) ) {
 				$form_errors[] = 'Debes seleccionar si eres Productor o Comercio.';
 			}
+			if ( empty( $_POST['classified_condition'] ) ) {
+				$form_errors[] = 'Debes seleccionar una condición para el producto.';
+			}
 
 			// Display errors if any
 			if ( ! empty( $form_errors ) ) {
@@ -44,11 +50,12 @@ function display_classified_form() {
 					'post_type'    => 'classified',
 				);
 
-				$classified_price    = floatval( wp_unslash( $_POST['classified_price'] ) );
-				$classified_currency = sanitize_text_field( wp_unslash( $_POST['classified_currency'] ) );
-				$classified_email    = sanitize_email( wp_unslash( $_POST['classified_email'] ) );
+				$classified_price     = floatval( wp_unslash( $_POST['classified_price'] ) );
+				$classified_currency  = sanitize_text_field( wp_unslash( $_POST['classified_currency'] ) );
+				$classified_email     = sanitize_email( wp_unslash( $_POST['classified_email'] ) );
 				$classified_user_type = sanitize_text_field( wp_unslash( $_POST['classified_user_type'] ) );
-				$classified_whatsapp = sanitize_text_field( wp_unslash( $_POST['classified_whatsapp'] ) );
+				$classified_condition = sanitize_text_field( wp_unslash( $_POST['classified_condition'] ) );
+				$classified_whatsapp  = sanitize_text_field( wp_unslash( $_POST['classified_whatsapp'] ) );
 
 				// Insert the post.
 				$classified_id = wp_insert_post( $classified_data );
@@ -63,7 +70,50 @@ function display_classified_form() {
 					update_post_meta( $classified_id, '_classified_currency', $classified_currency );
 					update_post_meta( $classified_id, '_classified_email', $classified_email );
 					update_post_meta( $classified_id, '_classified_user_type', $classified_user_type );
+					update_post_meta( $classified_id, '_classified_condition', $classified_condition );
 					update_post_meta( $classified_id, '_classified_whatsapp', $classified_whatsapp );
+
+					// Handle images.
+					if ( ! empty( $_FILES['classified_images']['name'][0] ) ) {
+						$image_ids   = array();
+						$image_count = count( $_FILES['classified_images']['name'] );
+
+						if ( $image_count > 5 ) {
+							$image_count = 5;
+						}
+
+						for ( $i = 0; $i < $image_count; $i++ ) {
+							$file = array(
+								'name'     => $_FILES['classified_images']['name'][ $i ],
+								'type'     => $_FILES['classified_images']['type'][ $i ],
+								'tmp_name' => $_FILES['classified_images']['tmp_name'][ $i ],
+								'error'    => $_FILES['classified_images']['error'][ $i ],
+								'size'     => $_FILES['classified_images']['size'][ $i ],
+							);
+
+							$upload_overrides = array( 'test_form' => false );
+							$movefile         = wp_handle_upload( $file, $upload_overrides );
+
+							if ( $movefile && ! isset( $movefile['error'] ) ) {
+								$attachment = array(
+									'post_mime_type' => $movefile['type'],
+									'post_title'     => sanitize_file_name( $movefile['file'] ),
+									'post_content'   => '',
+									'post_status'    => 'inherit',
+								);
+
+								$attachment_id = wp_insert_attachment( $attachment, $movefile['file'], $classified_id );
+								require_once ABSPATH . 'wp-admin/includes/image.php';
+								$attach_data = wp_generate_attachment_metadata( $attachment_id, $movefile['file'] );
+								wp_update_attachment_metadata( $attachment_id, $attach_data );
+								$image_ids[] = $attachment_id;
+							}
+						}
+
+						if ( ! empty( $image_ids ) ) {
+							update_post_meta( $classified_id, '_classified_images', $image_ids );
+						}
+					}
 
 					echo '<p style="background-color: #fffacd;">¡Tu Clasificado se ha creado correctamente!</p>';
 				} else {
@@ -142,11 +192,20 @@ function display_classified_form() {
 
 		<div class="classified-form-group classified-user-type-wrapper">
 			<label>Soy:</label><br>
-			<input type="radio" id="productor" name="classified_user_type" value="Productor" required>
-			<label for="productor">Productor</label><br>
+			<input type="radio" id="user_type_productor" name="classified_user_type" value="Productor" required>
+			<label for="user_type_productor">Productor</label><br>
 
-			<input type="radio" id="comercio" name="classified_user_type" value="Comercio" required>
-			<label for="comercio">Comercio</label>
+			<input type="radio" id="user_type_comercio" name="classified_user_type" value="Comercio" required>
+			<label for="user_type_comercio">Comercio</label>
+		</div>
+
+		<div class="classified-form-group">
+			<label>Condición:</label><br>
+			<input type="radio" id="condition_new" name="classified_condition" value="Nuevo" required>
+			<label for="condition_new">Nuevo</label><br>
+
+			<input type="radio" id="condition_used" name="classified_condition" value="Usado" required>
+			<label for="condition_used">Usado</label>
 		</div>
 
 		<div class="classified-form-group">
