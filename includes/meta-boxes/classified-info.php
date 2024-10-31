@@ -25,11 +25,11 @@ add_action( 'add_meta_boxes', 'classifieds_add_info_meta_box' );
 // Callback function to display the fields for Price, Currency, Condition in the same meta box
 function classifieds_info_box_html( $post ) {
 
-     // Retrieve stored values
-     $price = get_post_meta( $post->ID, '_classified_price', true );
-     $currency = get_post_meta( $post->ID, '_classified_currency', true );
-     $condition = get_post_meta( $post->ID, '_classified_condition', true );
-     $images_ids = get_post_meta( $post->ID, '_classified_images', true );
+    // Retrieve stored values
+    $price = get_post_meta( $post->ID, '_classified_price', true );
+    $currency = get_post_meta( $post->ID, '_classified_currency', true );
+    $condition = get_post_meta( $post->ID, '_classified_condition', true );
+    $location = get_post_meta( $post->ID, '_classified_location', true );
 
     // If no currency is selected, default to empty string
     if ( empty( $currency ) ) {
@@ -57,6 +57,11 @@ function classifieds_info_box_html( $post ) {
 
         <input type="radio" id="condition_used" name="classified_condition" value="Usado" <?php checked( $condition, 'Usado' ); ?>>
         <label for="condition_used">Usado</label><br>
+    </div>
+
+    <div class="location-wrapper">
+        <label for="classified_location">Localidad</label>
+        <input type="text" id="classified_location" name="classified_location" value="<?php echo esc_attr( $location ); ?>"> 
     </div>
 
     <?php

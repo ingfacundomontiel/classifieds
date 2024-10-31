@@ -26,15 +26,23 @@ function display_classified_form() {
 			if ( empty( $_POST['classified_currency'] ) ) {
 				$form_errors[] = 'Debes seleccionar una moneda.';
 			}
+			if ( empty( $_POST['classified_condition'] ) ) {
+				$form_errors[] = 'Debes seleccionar una condición para el producto.';
+			}
+			if ( empty( $_POST['classified_location'] ) ) {
+				$form_errors[] = 'La ubicación es obligatoria.';
+			}
 			if ( empty( $_POST['classified_category'] ) ) {
 				$form_errors[] = 'Debes seleccionar al menos una categoría.';
+			}
+			
+			if ( empty( $_POST['classified_email'] ) ) {
+				$form_errors[] = 'El correo electrónico es obligatorio.';
 			}
 			if ( empty( $_POST['classified_user_type'] ) ) {
 				$form_errors[] = 'Debes seleccionar si eres Productor o Comercio.';
 			}
-			if ( empty( $_POST['classified_condition'] ) ) {
-				$form_errors[] = 'Debes seleccionar una condición para el producto.';
-			}
+			
 
 			// Display errors if any
 			if ( ! empty( $form_errors ) ) {
@@ -50,12 +58,17 @@ function display_classified_form() {
 					'post_type'    => 'classified',
 				);
 
+
+				// Variables for Classified info.
 				$classified_price     = floatval( wp_unslash( $_POST['classified_price'] ) );
 				$classified_currency  = sanitize_text_field( wp_unslash( $_POST['classified_currency'] ) );
-				$classified_email     = sanitize_email( wp_unslash( $_POST['classified_email'] ) );
-				$classified_user_type = sanitize_text_field( wp_unslash( $_POST['classified_user_type'] ) );
 				$classified_condition = sanitize_text_field( wp_unslash( $_POST['classified_condition'] ) );
+				$classified_location = sanitize_text_field( wp_unslash( $_POST['classified_location'] ) );
+
+				// Variables for Contact info.
+				$classified_email     = sanitize_email( wp_unslash( $_POST['classified_email'] ) );
 				$classified_whatsapp  = sanitize_text_field( wp_unslash( $_POST['classified_whatsapp'] ) );
+				$classified_user_type = sanitize_text_field( wp_unslash( $_POST['classified_user_type'] ) );
 
 				// Insert the post.
 				$classified_id = wp_insert_post( $classified_data );
@@ -66,12 +79,17 @@ function display_classified_form() {
 					wp_set_post_terms( $classified_id, $categories, 'classified_category' );
 
 					// Save custom fields.
+					
+					// Custom fields for Classified info.
 					update_post_meta( $classified_id, '_classified_price', $classified_price );
 					update_post_meta( $classified_id, '_classified_currency', $classified_currency );
-					update_post_meta( $classified_id, '_classified_email', $classified_email );
-					update_post_meta( $classified_id, '_classified_user_type', $classified_user_type );
 					update_post_meta( $classified_id, '_classified_condition', $classified_condition );
+					update_post_meta( $classified_id, '_classified_location', $classified_location );
+
+					// Custom fields for Contact info.
+					update_post_meta( $classified_id, '_classified_email', $classified_email );
 					update_post_meta( $classified_id, '_classified_whatsapp', $classified_whatsapp );
+					update_post_meta( $classified_id, '_classified_user_type', $classified_user_type );
 
 					// Handle images.
 					if ( ! empty( $_FILES['classified_images']['name'][0] ) ) {
@@ -165,6 +183,20 @@ function display_classified_form() {
 		</div>
 
 		<div class="classified-form-group">
+			<label>Condición:</label><br>
+			<input type="radio" id="condition_new" name="classified_condition" value="Nuevo" required>
+			<label for="condition_new">Nuevo</label><br>
+
+			<input type="radio" id="condition_used" name="classified_condition" value="Usado" required>
+			<label for="condition_used">Usado</label>
+		</div>
+
+		<div class="classified-form-group">
+			<label for="classified_location">Localidad</label>
+			<input type="text" id="classified_location" name="classified_location" required>
+		</div>
+
+		<div class="classified-form-group">
 			<label for="classified_images">Imágenes (hasta 5):</label>
 			<input type="file" id="classified_images" name="classified_images[]" multiple="multiple" accept="image/*" />
 		</div>
@@ -186,7 +218,7 @@ function display_classified_form() {
 
 		<div class="classified-form-group">
 			<label for="classified_whatsapp">Número de WhatsApp:</label>
-			<input type="text" id="classified_whatsapp" name="classified_whatsapp" placeholder="Ej: 5491166667777" required>
+			<input type="text" id="classified_whatsapp" name="classified_whatsapp" placeholder="Ej: 5491166667777">
 			<p class="field-description whatsapp-field">Introduce el número de WhatsApp con código de país, sin espacios ni guiones. Ejemplo: 5491166667777</p>
 		</div>
 
@@ -197,15 +229,6 @@ function display_classified_form() {
 
 			<input type="radio" id="user_type_comercio" name="classified_user_type" value="Comercio" required>
 			<label for="user_type_comercio">Comercio</label>
-		</div>
-
-		<div class="classified-form-group">
-			<label>Condición:</label><br>
-			<input type="radio" id="condition_new" name="classified_condition" value="Nuevo" required>
-			<label for="condition_new">Nuevo</label><br>
-
-			<input type="radio" id="condition_used" name="classified_condition" value="Usado" required>
-			<label for="condition_used">Usado</label>
 		</div>
 
 		<div class="classified-form-group">
