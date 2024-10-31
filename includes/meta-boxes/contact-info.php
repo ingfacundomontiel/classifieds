@@ -31,6 +31,9 @@ function classifieds_contact_info_box_html( $post ) {
     // Get the stored user type value
     $user_type = get_post_meta( $post->ID, '_classified_user_type', true );
 
+    // Get the stored newsletter subscription value
+    $newsletter_subscription = get_post_meta( $post->ID, '_classified_newsletter_subscription', true );
+
     // Display the email field
     ?>
     
@@ -54,6 +57,9 @@ function classifieds_contact_info_box_html( $post ) {
 
     <input type="radio" id="comercio" name="classified_user_type" value="Comercio" <?php checked( $user_type, 'Comercio' ); ?> />
     <label for="comercio">Comercio</label><br>
+
+    <input type="checkbox" id="classified_newsletter_subscription" name="classified_newsletter_subscription" value="1" <?php checked( get_post_meta( $post->ID, '_classified_newsletter_subscription', true ), '1' ); ?> />
+    <label for="classified_newsletter_subscription">Suscripción a Newsletter</label>
     <?php
 }
 
