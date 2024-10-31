@@ -28,8 +28,12 @@ function classifieds_contact_info_box_html( $post ) {
     $email = get_post_meta( $post->ID, '_classified_email', true );
     $whatsapp_number = get_post_meta( $post->ID, '_classified_whatsapp', true );
 
+    // Get the stored user type value
+    $user_type = get_post_meta( $post->ID, '_classified_user_type', true );
+
     // Display the email field
     ?>
+    
     <label for="classified_email">Correo electrónico:</label>
     <input type="email" name="classified_email" value="<?php echo esc_attr( $email ); ?>" size="25" />
     <br><br>
@@ -40,6 +44,16 @@ function classifieds_contact_info_box_html( $post ) {
     <label for="classified_whatsapp">Número de WhatsApp:</label>
     <input type="text" id="classified_whatsapp" name="classified_whatsapp" value="<?php echo esc_attr( $whatsapp_number ); ?>" size="25" />
     <p class="description">Introduce el número de WhatsApp con código de país, sin espacios ni guiones. Ejemplo: 5491166667777</p>
+    <?php
+
+    // Display radio buttons for user type selection
+    ?>
+    <label for="classified_whatsapp">Tipo de Usuario</label>
+    <input type="radio" id="productor" name="classified_user_type" value="Productor" <?php checked( $user_type, 'Productor' ); ?> />
+    <label for="productor">Productor</label><br>
+
+    <input type="radio" id="comercio" name="classified_user_type" value="Comercio" <?php checked( $user_type, 'Comercio' ); ?> />
+    <label for="comercio">Comercio</label><br>
     <?php
 }
 
@@ -59,6 +73,12 @@ function classifieds_save_contact_info_meta( $post_id ) {
     if ( isset( $_POST['classified_whatsapp'] ) ) {
         $whatsapp_number = sanitize_text_field( $_POST['classified_whatsapp'] );
         update_post_meta( $post_id, '_classified_whatsapp', $whatsapp_number );
+    }
+
+     // Check if the User Type field is set and sanitize it
+     if ( isset( $_POST['classified_user_type'] ) ) {
+        $user_type = sanitize_text_field( wp_unslash( $_POST['classified_user_type'] ) );
+        update_post_meta( $post_id, '_classified_user_type', $user_type );
     }
 }
 
