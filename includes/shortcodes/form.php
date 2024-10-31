@@ -135,6 +135,21 @@ function display_classified_form() {
 						}
 					}
 
+					// Send notification email.
+					$to = array(
+						'ingfacundomontiel@gmail.com',
+						'info@ganaderiaynegocios.com',
+					);
+					$subject = 'Nuevo Clasificado - Pendiente de moderación';
+					$message = 'Se ha enviado un nuevo Clasificado.' . "\n\n";
+					$message .= 'Título: ' . sanitize_text_field( wp_unslash( $_POST['classified_title'] ) ) . "\n";
+					$message .= 'Correo electrónico del vendedor: ' . sanitize_email( wp_unslash( $_POST['classified_email'] ) ) . "\n";
+					$message .= 'Para revisar y aprobar el Clasificado, visita el panel de administración de WordPress.' . "\n\n";
+					$headers = array('Content-Type: text/plain; charset=UTF-8');
+
+					wp_mail( $to, $subject, $message, $headers );
+
+
 					echo '<p style="background-color: #fffacd;">¡Tu Clasificado se ha creado correctamente!</p>';
 				} else {
 					echo '<p style="background-color: #fffacd;">Hubo un error procesando tu Clasificado. Por favor, refresca la página e intentalo nuevamente.</p>';
