@@ -245,7 +245,7 @@ function display_classified_form() {
 			</div>
 		</div>
 
-		<div class="classified-form-group">
+		<div class="classified-form-group consent-group">
 			<div class="checkbox-wrapper">
 				<input type="checkbox" id="newsletter_subscription" name="newsletter_subscription">
 				<label for="newsletter_subscription">
@@ -262,7 +262,7 @@ function display_classified_form() {
 				<input type="checkbox" id="terms_conditions" name="terms_conditions" required>
 				<label for="terms_conditions">
 					Acepto los 
-					<a href="https://ganaderiaynegocios.com/clasificados-terminos-y-condiciones/">Términos y Condiciones</a>
+					<a class="terms-conditions" target="_blank" href="https://ganaderiaynegocios.com/clasificados-terminos-y-condiciones/">Términos y Condiciones</a>
 				</label>
 			</div>
 		</div>

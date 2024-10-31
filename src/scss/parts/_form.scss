@@ -1,7 +1,7 @@
 // Classified form styles
 .classified-input-form {
-    max-width: 600px;
-    margin: 0 auto;
+    max-width: 800px;
+    margin: 0;
     padding: 20px;
     border: 1px solid $border-color;
     border-radius: 5px;
@@ -26,6 +26,7 @@
             border: 1px solid $border-color;
             border-radius: $border-radius;
             margin-bottom: 10px;
+            background: #fff;
         }
 
         textarea {
@@ -83,6 +84,17 @@
         .classified-form-group {
             &:last-child {
                 margin-bottom: 0;
+            }
+        }
+    }
+
+    .consent-group {
+        label {
+            a {
+                .terms-conditions {
+                    text-decoration: underline;
+                    font-weight: bold;
+                }
             }
         }
     }
