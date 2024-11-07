@@ -40,7 +40,7 @@ function display_classified_form() {
 		</div>
 
 		<div class="classified-form-group">
-			<label for="classified_currency">Moneda:</label>
+			<label for="classified_currency">Moneda</label>
 			<div class="checkbox-wrapper">
 				<input type="radio" id="currency_ars" name="classified_currency" value="ARS" required>
 				<label for="currency_ars">Pesos Argentinos</label>
@@ -52,7 +52,7 @@ function display_classified_form() {
 		</div>
 
 		<div class="classified-form-group">
-			<label for="classified_condition">Condición:</label>
+			<label for="classified_condition">Condición</label>
 			<div class="checkbox-wrapper">
 				<input type="radio" id="condition_new" name="classified_condition" value="Nuevo" required>
 				<label for="condition_new">Nuevo</label>
@@ -69,7 +69,8 @@ function display_classified_form() {
 		</div>
 
 		<div class="classified-form-group">
-			<label for="classified_images">Imágenes (hasta 5):</label>
+			<label class="mb-0" for="classified_images">Imágenes</label>
+			<p class="info-text mt-0">(hasta 5, tamaño máximo: 1MB)</p>
 			<input type="file" id="classified_images" name="classified_images[]" multiple="multiple" accept="image/*">
 		</div>
 

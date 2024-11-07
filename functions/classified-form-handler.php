@@ -26,30 +26,61 @@ function handle_classified_submission() {
 		wp_send_json_error( 'Security error: form could not be processed.' );
 	}
 
+	// Initialize an array to store validation errors.
+	$form_errors = array();
+
 	// Validate required fields.
 	if ( empty( $_POST['classified_title'] ) ) {
 		$form_errors[] = 'The title is required.';
 	}
-	if ( empty( $_POST['classified_price'] ) ) {
-		$form_errors[] = 'The price is required.';
+
+	$classified_price = isset( $_POST['classified_price'] ) ? floatval( wp_unslash( $_POST['classified_price'] ) ) : '0';
+	if ( empty( $classified_price ) ) {
+		$form_errors[] = 'The price must be greater than zero.';
 	}
-	if ( empty( $_POST['classified_currency'] ) ) {
-		$form_errors[] = 'You must select a currency.';
+
+	$allowed_currencies  = array( 'ARS', 'USD' );
+	$classified_currency = isset( $_POST['classified_currency'] ) ? sanitize_text_field( wp_unslash( $_POST['classified_currency'] ) ) : 'ARS';
+	if ( ! in_array( $classified_currency, $allowed_currencies, true ) ) {
+		$form_errors[] = 'Invalid currency selected.';
 	}
-	if ( empty( $_POST['classified_condition'] ) ) {
-		$form_errors[] = 'You must select a condition for the product.';
+
+	$allowed_conditions   = array( 'Nuevo', 'Usado' );
+	$classified_condition = isset( $_POST['classified_condition'] ) ? sanitize_text_field( wp_unslash( $_POST['classified_condition'] ) ) : 'Nuevo';
+	if ( ! in_array( $classified_condition, $allowed_conditions, true ) ) {
+		$form_errors[] = 'Invalid product condition selected.';
 	}
+
 	if ( empty( $_POST['classified_location'] ) ) {
 		$form_errors[] = 'The location is required.';
 	}
-	if ( empty( $_POST['classified_category'] ) ) {
+
+	$categories = isset( $_POST['classified_category'] ) ? array_map( 'intval', wp_unslash( $_POST['classified_category'] ) ) : array();
+	if ( empty( $categories ) ) {
 		$form_errors[] = 'You must select at least one category.';
+	} else {
+		foreach ( $categories as $category_id ) {
+			if ( ! term_exists( $category_id, 'classified_category' ) ) {
+				$form_errors[] = 'Invalid category selected.';
+				break;
+			}
+		}
 	}
-	if ( empty( $_POST['classified_email'] ) ) {
-		$form_errors[] = 'The email is required.';
+
+	$classified_email = isset( $_POST['classified_email'] ) ? sanitize_email( wp_unslash( $_POST['classified_email'] ) ) : '';
+	if ( ! is_email( $classified_email ) ) {
+		$form_errors[] = 'The provided email address is not valid.';
 	}
+
 	if ( empty( $_POST['classified_user_type'] ) ) {
 		$form_errors[] = 'You must select if you are a Producer or a Business.';
+	}
+
+	if ( ! empty( $_POST['classified_whatsapp'] ) ) {
+		$classified_whatsapp = sanitize_text_field( wp_unslash( $_POST['classified_whatsapp'] ) );
+		if ( ! preg_match( '/^\d{10,15}$/', $classified_whatsapp ) ) {
+			$form_errors[] = 'Invalid WhatsApp number format. Please enter the number without spaces or symbols.';
+		}
 	}
 
 	// Return validation errors if any.
@@ -65,18 +96,6 @@ function handle_classified_submission() {
 		'post_type'    => 'classified',
 	);
 
-	// Variables for Classified info.
-	$classified_price     = floatval( wp_unslash( $_POST['classified_price'] ) );
-	$classified_currency  = sanitize_text_field( wp_unslash( $_POST['classified_currency'] ) );
-	$classified_condition = sanitize_text_field( wp_unslash( $_POST['classified_condition'] ) );
-	$classified_location  = sanitize_text_field( wp_unslash( $_POST['classified_location'] ) );
-
-	// Variables for Contact info.
-	$classified_email                   = sanitize_email( wp_unslash( $_POST['classified_email'] ) );
-	$classified_whatsapp                = isset( $_POST['classified_whatsapp'] ) ? sanitize_text_field( wp_unslash( $_POST['classified_whatsapp'] ) ) : '';
-	$classified_user_type               = sanitize_text_field( wp_unslash( $_POST['classified_user_type'] ) );
-	$classified_newsletter_subscription = isset( $_POST['newsletter_subscription'] ) ? 1 : 0;
-
 	// Insert the post.
 	$classified_id = wp_insert_post( $classified_data );
 
@@ -85,20 +104,21 @@ function handle_classified_submission() {
 	}
 
 	// Assign the category.
-	$categories = array_map( 'intval', wp_unslash( $_POST['classified_category'] ) );
 	wp_set_post_terms( $classified_id, $categories, 'classified_category' );
 
 	// Save custom fields.
 	update_post_meta( $classified_id, '_classified_price', $classified_price );
 	update_post_meta( $classified_id, '_classified_currency', $classified_currency );
 	update_post_meta( $classified_id, '_classified_condition', $classified_condition );
-	update_post_meta( $classified_id, '_classified_location', $classified_location );
+	update_post_meta( $classified_id, '_classified_location', sanitize_text_field( wp_unslash( $_POST['classified_location'] ) ) );
 
 	// Save custom fields for Contact info.
 	update_post_meta( $classified_id, '_classified_email', $classified_email );
-	update_post_meta( $classified_id, '_classified_whatsapp', $classified_whatsapp );
-	update_post_meta( $classified_id, '_classified_user_type', $classified_user_type );
-	update_post_meta( $classified_id, '_classified_newsletter_subscription', $classified_newsletter_subscription );
+	if ( isset( $classified_whatsapp ) ) {
+		update_post_meta( $classified_id, '_classified_whatsapp', $classified_whatsapp );
+	}
+	update_post_meta( $classified_id, '_classified_user_type', sanitize_text_field( wp_unslash( $_POST['classified_user_type'] ) ) );
+	update_post_meta( $classified_id, '_classified_newsletter_subscription', isset( $_POST['newsletter_subscription'] ) ? 1 : 0 );
 
 	// Handle images.
 	if ( ! empty( $_FILES['classified_images']['name'][0] ) ) {
@@ -109,6 +129,9 @@ function handle_classified_submission() {
 			$image_count = 5;
 		}
 
+		$allowed_mime_types = array( 'image/jpeg', 'image/png', 'image/gif', 'image/webp' );
+		$max_file_size      = 1 * 1024 * 1024; // 1MB.
+
 		for ( $i = 0; $i < $image_count; $i++ ) {
 			$file = array(
 				'name'     => isset( $_FILES['classified_images']['name'][ $i ] ) ? sanitize_file_name( wp_unslash( $_FILES['classified_images']['name'][ $i ] ) ) : '',
@@ -117,6 +140,19 @@ function handle_classified_submission() {
 				'error'    => isset( $_FILES['classified_images']['error'][ $i ] ) ? intval( wp_unslash( $_FILES['classified_images']['error'][ $i ] ) ) : 0,
 				'size'     => isset( $_FILES['classified_images']['size'][ $i ] ) ? intval( wp_unslash( $_FILES['classified_images']['size'][ $i ] ) ) : 0,
 			);
+
+			// Validate file type and size.
+			if ( ! in_array( $file['type'], $allowed_mime_types, true ) ) {
+				wp_send_json_error( 'Invalid file type. Only JPG, PNG, GIF and WEBP are allowed.' );
+			}
+
+			if ( $file['size'] > $max_file_size ) {
+				wp_send_json_error( 'One or more files exceed the maximum size of 1MB.' );
+			}
+
+			if ( UPLOAD_ERR_OK !== $file['error'] ) {
+				wp_send_json_error( 'There was an error uploading one or more files.' );
+			}
 
 			$upload_overrides = array( 'test_form' => false );
 			$movefile         = wp_handle_upload( $file, $upload_overrides );
@@ -143,16 +179,17 @@ function handle_classified_submission() {
 	}
 
 	// Send notification email.
-	$to       = array(
+	$to = array(
 		'comunicpractica@gmail.com',
 		'ingfacundomontiel@gmail.com',
 		'info@ganaderiaynegocios.com',
 	);
-	$subject  = 'New Classified - Pending Moderation';
-	$message  = "A new classified has been submitted.\n\n";
-	$message .= 'Title: ' . $classified_data['post_title'] . "\n";
-	$message .= 'Seller Email: ' . $classified_email . "\n\n";
-	$message .= 'To review and approve the classified, visit the WordPress admin panel.' . "\n\n";
+
+	$subject  = 'Nuevo Clasificado - Pendiente de moderación';
+	$message  = 'Se ha enviado un nuevo Clasificado.' . "\n\n";
+	$message .= 'Título: ' . sanitize_text_field( wp_unslash( $_POST['classified_title'] ) ) . "\n";
+	$message .= 'Correo electrónico del vendedor: ' . sanitize_email( wp_unslash( $_POST['classified_email'] ) ) . "\n";
+	$message .= 'Para revisar y aprobar el Clasificado, visita el panel de administración de WordPress.' . "\n\n";
 	$headers  = array( 'Content-Type: text/plain; charset=UTF-8' );
 
 	wp_mail( $to, $subject, $message, $headers );

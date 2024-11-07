@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 submitButton.value = 'Enviado';
 
                 if (data.success) {
-                    responseMessage.textContent = '¡Tu Clasificado se ha creado correctamente! La publicación puede demorarse un plazo efectivo máximo de hasta 48 hs.';
+                    responseMessage.textContent = '¡Tu Clasificado se ha creado correctamente!<br>La publicación puede demorarse un plazo efectivo máximo de hasta 48 hs.';
                     responseMessage.style.color = 'green';
                 } else {
                     responseMessage.textContent = 'Hubo un error: ' + data.data;
