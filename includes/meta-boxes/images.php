@@ -90,6 +90,6 @@ function classifieds_enqueue_media_uploader( $hook ) {
 
 	// Enqueue the WordPress media uploader scripts .
 	wp_enqueue_media();
-	wp_enqueue_script( 'classifieds-images-admin', plugin_dir_url( __FILE__ ) . '../js/admin-images.js', array( 'jquery' ), null, true );
+	wp_enqueue_script( 'classifieds-images-admin', plugin_dir_url( __FILE__ ) . '../assets/js/admin-images.js', array( 'jquery' ), null, true );
 }
 add_action( 'admin_enqueue_scripts', 'classifieds_enqueue_media_uploader' ); // Hook to enqueue the media uploader scripts.

@@ -45,6 +45,7 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/shortcodes.php'; // Include
 // Include Functions.
 
 require_once plugin_dir_path( __FILE__ ) . 'functions/enqueue-assets.php'; // Include the file that enqueues the assets.
+require_once plugin_dir_path( __FILE__ ) . 'functions/classified-form-handler.php'; // Include the file that handles the classified form submission via AJAX.
 require_once plugin_dir_path( __FILE__ ) . 'functions/custom-template.php'; // Include the file that loads the custom template.
 require_once plugin_dir_path( __FILE__ ) . 'functions/print-classified-categories.php'; // Include the file that prints the categories.
 require_once plugin_dir_path( __FILE__ ) . 'functions/custom-excerpt.php'; // Include the file that customizes excerpts.

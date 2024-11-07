@@ -5,161 +5,10 @@
  * @package classifieds
  */
 
-// Include the classified fields configuration file.
-// include_once plugin_dir_path( __DIR__ ) . '../classified-fields.php';
-
+/**
+ * Displays a form for users to submit new Classified posts.
+ */
 function display_classified_form() {
-	if ( 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST['submit_classified'] ) ) {
-		// Check if the nonce is set and valid.
-		if ( isset( $_POST['_wpnonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['_wpnonce'] ) ), 'submit_classified' ) ) {
-
-			// Initialize an array to store validation errors.
-			$form_errors = array();
-
-			// Check required fields.
-			if ( empty( $_POST['classified_title'] ) ) {
-				$form_errors[] = 'El título es obligatorio.';
-			}
-			if ( empty( $_POST['classified_price'] ) ) {
-				$form_errors[] = 'El precio es obligatorio.';
-			}
-			if ( empty( $_POST['classified_currency'] ) ) {
-				$form_errors[] = 'Debes seleccionar una moneda.';
-			}
-			if ( empty( $_POST['classified_condition'] ) ) {
-				$form_errors[] = 'Debes seleccionar una condición para el producto.';
-			}
-			if ( empty( $_POST['classified_location'] ) ) {
-				$form_errors[] = 'La ubicación es obligatoria.';
-			}
-			if ( empty( $_POST['classified_category'] ) ) {
-				$form_errors[] = 'Debes seleccionar al menos una categoría.';
-			}
-			
-			if ( empty( $_POST['classified_email'] ) ) {
-				$form_errors[] = 'El correo electrónico es obligatorio.';
-			}
-			if ( empty( $_POST['classified_user_type'] ) ) {
-				$form_errors[] = 'Debes seleccionar si eres Productor o Comercio.';
-			}
-			
-
-			// Display errors if any
-			if ( ! empty( $form_errors ) ) {
-				foreach ( $form_errors as $error ) {
-					echo '<p style="color: red; background-color: #fffacd;">' . esc_html( $error ) . '</p>';
-				}
-			} else {
-				// Sanitize and process the classified data if no errors.
-				$classified_data = array(
-					'post_title'   => sanitize_text_field( wp_unslash( $_POST['classified_title'] ) ),
-					'post_content' => sanitize_textarea_field( wp_unslash( $_POST['classified_description'] ) ),
-					'post_status'  => 'pending',
-					'post_type'    => 'classified',
-				);
-
-
-				// Variables for Classified info.
-				$classified_price     = floatval( wp_unslash( $_POST['classified_price'] ) );
-				$classified_currency  = sanitize_text_field( wp_unslash( $_POST['classified_currency'] ) );
-				$classified_condition = sanitize_text_field( wp_unslash( $_POST['classified_condition'] ) );
-				$classified_location = sanitize_text_field( wp_unslash( $_POST['classified_location'] ) );
-
-				// Variables for Contact info.
-				$classified_email     = sanitize_email( wp_unslash( $_POST['classified_email'] ) );
-				$classified_whatsapp  = sanitize_text_field( wp_unslash( $_POST['classified_whatsapp'] ) );
-				$classified_user_type = sanitize_text_field( wp_unslash( $_POST['classified_user_type'] ) );
-				$classified_newsletter_subscription = isset( $_POST['newsletter_subscription'] ) ? 1 : 0;
-
-				// Insert the post.
-				$classified_id = wp_insert_post( $classified_data );
-
-				if ( $classified_id ) {
-					// Assign the category.
-					$categories = array_map( 'intval', wp_unslash( $_POST['classified_category'] ) );
-					wp_set_post_terms( $classified_id, $categories, 'classified_category' );
-
-					// Save custom fields.
-					
-					// Custom fields for Classified info.
-					update_post_meta( $classified_id, '_classified_price', $classified_price );
-					update_post_meta( $classified_id, '_classified_currency', $classified_currency );
-					update_post_meta( $classified_id, '_classified_condition', $classified_condition );
-					update_post_meta( $classified_id, '_classified_location', $classified_location );
-
-					// Custom fields for Contact info.
-					update_post_meta( $classified_id, '_classified_email', $classified_email );
-					update_post_meta( $classified_id, '_classified_whatsapp', $classified_whatsapp );
-					update_post_meta( $classified_id, '_classified_user_type', $classified_user_type );
-					update_post_meta( $classified_id, '_classified_newsletter_subscription', $classified_newsletter_subscription );
-
-					// Handle images.
-					if ( ! empty( $_FILES['classified_images']['name'][0] ) ) {
-						$image_ids   = array();
-						$image_count = count( $_FILES['classified_images']['name'] );
-
-						if ( $image_count > 5 ) {
-							$image_count = 5;
-						}
-
-						for ( $i = 0; $i < $image_count; $i++ ) {
-							$file = array(
-								'name'     => $_FILES['classified_images']['name'][ $i ],
-								'type'     => $_FILES['classified_images']['type'][ $i ],
-								'tmp_name' => $_FILES['classified_images']['tmp_name'][ $i ],
-								'error'    => $_FILES['classified_images']['error'][ $i ],
-								'size'     => $_FILES['classified_images']['size'][ $i ],
-							);
-
-							$upload_overrides = array( 'test_form' => false );
-							$movefile         = wp_handle_upload( $file, $upload_overrides );
-
-							if ( $movefile && ! isset( $movefile['error'] ) ) {
-								$attachment = array(
-									'post_mime_type' => $movefile['type'],
-									'post_title'     => sanitize_file_name( $movefile['file'] ),
-									'post_content'   => '',
-									'post_status'    => 'inherit',
-								);
-
-								$attachment_id = wp_insert_attachment( $attachment, $movefile['file'], $classified_id );
-								require_once ABSPATH . 'wp-admin/includes/image.php';
-								$attach_data = wp_generate_attachment_metadata( $attachment_id, $movefile['file'] );
-								wp_update_attachment_metadata( $attachment_id, $attach_data );
-								$image_ids[] = $attachment_id;
-							}
-						}
-
-						if ( ! empty( $image_ids ) ) {
-							update_post_meta( $classified_id, '_classified_images', $image_ids );
-						}
-					}
-
-					// Send notification email.
-					$to = array(
-						'ingfacundomontiel@gmail.com',
-						'info@ganaderiaynegocios.com',
-					);
-					$subject = 'Nuevo Clasificado - Pendiente de moderación';
-					$message = 'Se ha enviado un nuevo Clasificado.' . "\n\n";
-					$message .= 'Título: ' . sanitize_text_field( wp_unslash( $_POST['classified_title'] ) ) . "\n";
-					$message .= 'Correo electrónico del vendedor: ' . sanitize_email( wp_unslash( $_POST['classified_email'] ) ) . "\n";
-					$message .= 'Para revisar y aprobar el Clasificado, visita el panel de administración de WordPress.' . "\n\n";
-					$headers = array('Content-Type: text/plain; charset=UTF-8');
-
-					wp_mail( $to, $subject, $message, $headers );
-
-
-					echo '<p style="background-color: #fffacd;">¡Tu Clasificado se ha creado correctamente!</p>';
-				} else {
-					echo '<p style="background-color: #fffacd;">Hubo un error procesando tu Clasificado. Por favor, refresca la página e intentalo nuevamente.</p>';
-				}
-			}
-		} else {
-			// Nonce verification failed.
-			echo '<p style="background-color: #fffacd;">Error de seguridad: El formulario no pudo ser procesado.</p>';
-		}
-	}
 
 	$categories = get_terms(
 		array(
@@ -172,7 +21,7 @@ function display_classified_form() {
 	ob_start();
 	?>
 
-	<form id="classifiedForm" action="" method="post" enctype="multipart/form-data" class="classified-input-form">
+	<form id="classifiedForm" action="" method="post" enctype="multipart/form-data" class="classified-input-form" data-ajax-url="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>">
 		<?php wp_nonce_field( 'submit_classified' ); ?>
 
 		<div class="classified-form-group">
@@ -285,8 +134,9 @@ function display_classified_form() {
 		<div class="classified-form-group">
 			<input type="submit" name="submit_classified" value="Enviar Clasificado">
 		</div>
-	</form>
 
+		<div id="loader"></div>
+	</form>
 
 	<?php
 	return ob_get_clean();

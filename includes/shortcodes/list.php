@@ -11,51 +11,50 @@
  *
  * @return string HTML content for the classifieds list.
  */
-function display_classifieds_list()
-{
+function display_classifieds_list() {
 	$args  = array(
 		'post_type'      => 'classified', // Custom post type "classified".
 		'posts_per_page' => -1, // Retrieve all posts.
 	);
-	$query = new WP_Query($args); // Create a new query.
+	$query = new WP_Query( $args ); // Create a new query.
 
 	ob_start(); // Start output buffering.
 
-	if ($query->have_posts()) :
-?>
+	if ( $query->have_posts() ) :
+		?>
 		<div class="classified-list-wrapper">
 			<div class="container">
 				<div class="row">
 					<div class="col-12">
 						<div class="classified-list">
 							<?php
-							while ($query->have_posts()) :
+							while ( $query->have_posts() ) :
 								$query->the_post();
-								$terms = wp_get_post_terms(get_the_ID(), 'classified_category'); // Retrieve the classified categories.
-								$price     = get_post_meta(get_the_ID(), '_classified_price', true); // Retrieve the classified price.
-								$currency  = get_post_meta(get_the_ID(), '_classified_currency', true); // Retrieve the classified currency.
-							?>
+								$terms    = wp_get_post_terms( get_the_ID(), 'classified_category' ); // Retrieve the classified categories.
+								$price    = get_post_meta( get_the_ID(), '_classified_price', true ); // Retrieve the classified price.
+								$currency = get_post_meta( get_the_ID(), '_classified_currency', true ); // Retrieve the classified currency.
+								?>
 
-								<a class="permalink classified" href="<?php echo esc_url(the_permalink()); ?>">
+								<a class="permalink classified" href="<?php echo esc_url( the_permalink() ); ?>">
 
 									<div class="featured-image-wrapper">
 										<?php
-										if (has_post_thumbnail()) :
-											$image = wp_get_attachment_image_src(get_post_thumbnail_id(), 'thumbnail');
-										?>
-											<img class="featured-image" src="<?php echo esc_url($image[0]); ?>" alt="<?php the_title(); ?>">
-										<?php
+										if ( has_post_thumbnail() ) :
+											$image = wp_get_attachment_image_src( get_post_thumbnail_id(), 'thumbnail' );
+											?>
+											<img class="featured-image" src="<?php echo esc_url( $image[0] ); ?>" alt="<?php the_title(); ?>">
+											<?php
 										else :
-										?>
-											<img class="featured-image" src="<?php echo esc_url(get_template_directory_uri() . '/images/placeholder.png'); ?>" alt="<?php the_title(); ?>">
-										<?php
+											?>
+											<img class="featured-image" src="<?php echo esc_url( get_template_directory_uri() . '/images/placeholder.png' ); ?>" alt="<?php the_title(); ?>">
+											<?php
 										endif;
 										?>
 									</div>
 
-									<?php if (! empty($price)) : ?>
+									<?php if ( ! empty( $price ) ) : ?>
 										<div class="price">
-											<p><?php echo ('USD' === $currency) ? 'USD$ ' : 'ARS$ ', esc_html($price); ?></p>
+											<p><?php echo ( 'USD' === $currency ) ? 'USD$ ' : 'ARS$ ', esc_html( $price ); ?></p>
 										</div>
 									<?php endif; ?>
 
@@ -65,18 +64,18 @@ function display_classifieds_list()
 
 									<div class="content">
 										<?php
-										echo custom_trim_content(get_the_content()); // Trim the content to 15 words.
+										echo esc_html( custom_trim_content( get_the_content() ) ); // Trim the content to 15 words.
 										?>
 									</div>
 
-									<?php if (! empty($terms) && ! is_wp_error($terms)) : ?>
+									<?php if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) : ?>
 										<div class="categories">
-											<?php display_post_terms(get_the_ID(), 'classified_category'); ?>
+											<?php display_post_terms( get_the_ID(), 'classified_category' ); ?>
 										</div>
 									<?php endif; ?>
 
 								</a>
-							<?php
+								<?php
 							endwhile;
 							?>
 						</div>
@@ -84,7 +83,7 @@ function display_classifieds_list()
 				</div>
 			</div>
 		</div>
-<?php
+		<?php
 	else :
 		echo 'No se encontraron Clasificados.'; // Display a message if no classifieds are found.
 	endif;
@@ -93,4 +92,4 @@ function display_classifieds_list()
 	return ob_get_clean(); // Return the buffered content.
 }
 
-add_shortcode('classifieds_list', 'display_classifieds_list'); // Register shortcode.
+add_shortcode( 'classifieds_list', 'display_classifieds_list' ); // Register shortcode.
