@@ -11,6 +11,11 @@
  * @return void
  */
 function handle_classified_submission() {
+	// Check if the nonce is set and valid.
+	if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ), 'submit_classified' ) ) {
+		wp_send_json_error( 'Security error: form could not be processed.' );
+	}
+
 	// Verify that the request is an AJAX call.
 	if ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) {
 		wp_send_json_error( 'Invalid request.' );
@@ -21,17 +26,26 @@ function handle_classified_submission() {
 		wp_send_json_error( 'Invalid submission method.' );
 	}
 
-	// Check if the nonce is set and valid.
-	if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ), 'submit_classified' ) ) {
-		wp_send_json_error( 'Security error: form could not be processed.' );
+	// Verify the header referer to protect against CSRF attacks.
+	if ( ! isset( $_SERVER['HTTP_REFERER'] ) || strpos( sanitize_text_field( wp_unslash( $_SERVER['HTTP_REFERER'] ) ), get_site_url() ) !== 0 ) {
+		wp_send_json_error( 'Invalid referer.' );
+	}
+
+	// Verify the header origin to protect against CSRF attacks.
+	if ( isset( $_SERVER['HTTP_ORIGIN'] ) && get_site_url() !== $_SERVER['HTTP_ORIGIN'] ) {
+		wp_send_json_error( 'Invalid origin.' );
 	}
 
 	// Initialize an array to store validation errors.
 	$form_errors = array();
 
 	// Validate required fields.
-	if ( empty( $_POST['classified_title'] ) ) {
+	if ( ! isset( $_POST['classified_title'] ) || empty( $_POST['classified_title'] ) ) {
 		$form_errors[] = 'The title is required.';
+	}
+
+	if ( ! isset( $_POST['classified_description'] ) || empty( $_POST['classified_description'] ) ) {
+		$form_errors[] = 'The description is required.';
 	}
 
 	$classified_price = isset( $_POST['classified_price'] ) ? floatval( wp_unslash( $_POST['classified_price'] ) ) : '0';
@@ -51,7 +65,7 @@ function handle_classified_submission() {
 		$form_errors[] = 'Invalid product condition selected.';
 	}
 
-	if ( empty( $_POST['classified_location'] ) ) {
+	if ( ! isset( $_POST['classified_location'] ) || empty( $_POST['classified_location'] ) ) {
 		$form_errors[] = 'The location is required.';
 	}
 
@@ -72,11 +86,11 @@ function handle_classified_submission() {
 		$form_errors[] = 'The provided email address is not valid.';
 	}
 
-	if ( empty( $_POST['classified_user_type'] ) ) {
+	if ( ! isset( $_POST['classified_user_type'] ) || empty( $_POST['classified_user_type'] ) ) {
 		$form_errors[] = 'You must select if you are a Producer or a Business.';
 	}
 
-	if ( ! empty( $_POST['classified_whatsapp'] ) ) {
+	if ( ! isset( $_POST['classified_whatsapp'] ) || ! empty( $_POST['classified_whatsapp'] ) ) {
 		$classified_whatsapp = sanitize_text_field( wp_unslash( $_POST['classified_whatsapp'] ) );
 		if ( ! preg_match( '/^\d{10,15}$/', $classified_whatsapp ) ) {
 			$form_errors[] = 'Invalid WhatsApp number format. Please enter the number without spaces or symbols.';

@@ -31,15 +31,17 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 // Ocultar el loader y habilitar el botón de enviar
                 loader.style.display = 'none';
-                submitButton.disabled = true;
-                submitButton.value = 'Enviado';
 
                 if (data.success) {
-                    responseMessage.textContent = '¡Tu Clasificado se ha creado correctamente!<br>La publicación puede demorarse un plazo efectivo máximo de hasta 48 hs.';
+                    responseMessage.innerHTML = '¡Tu Clasificado se ha creado correctamente!<br>La publicación puede demorarse un plazo efectivo máximo de hasta 48 hs.';
                     responseMessage.style.color = 'green';
+
+                    submitButton.disabled = true;
+                    submitButton.value = 'Enviado';
                 } else {
                     responseMessage.textContent = 'Hubo un error: ' + data.data;
                     responseMessage.style.color = 'red';
+                    submitButton.disabled = false;
                 }
 
                 responseMessage.style.display = 'block';
