@@ -10,36 +10,42 @@ get_header();
 ?>
 <main id="primary" class="site-main single-page single-classified-content">
 	<?php
-	if (have_posts()) :
+	if ( have_posts() ) :
 
-		while (have_posts()) :
+		while ( have_posts() ) :
 
 			the_post();
 
-			$price     = get_post_meta(get_the_ID(), '_classified_price', true);
-			$currency  = get_post_meta(get_the_ID(), '_classified_currency', true);
-			$image_ids = get_post_meta(get_the_ID(), '_classified_images', true);
-			$whatsapp_number = get_post_meta(get_the_ID(), '_classified_whatsapp', true);
+			$price           = get_post_meta( get_the_ID(), '_classified_price', true );
+			$currency        = get_post_meta( get_the_ID(), '_classified_currency', true );
+			$image_ids       = get_post_meta( get_the_ID(), '_classified_images', true );
+			$whatsapp_number = get_post_meta( get_the_ID(), '_classified_whatsapp', true );
 
-	?>
+			?>
 			<section class="block the-content">
 				<div class="container">
 					<div class="row">
-						<div class="col-12 col-lg-5 carousel-col">
 
+						<div class="classifieds-cta-container">
+							<a href="https://ganaderiaynegocios.com/clasificados/" class="classifieds-cta">
+								VOLVER A CLASIFICADOS
+							</a>
+						</div>
+
+						<div class="col-12 col-lg-5 carousel-col">
 							<?php
-							if (! empty($image_ids)) {
-							?>
+							if ( ! empty( $image_ids ) ) {
+								?>
 								<div id="classifiedCarousel" class="carousel slide" data-bs-ride="carousel">
 									<div class="carousel-inner">
 										<?php
 										$active_class = 'active';
-										foreach ($image_ids as $image_id) {
-										?>
-											<div class="carousel-item <?php echo esc_attr($active_class); ?>">
-												<?php echo wp_get_attachment_image($image_id, 'large', false, array('class' => 'd-block w-100 classified-carousel-img')); ?>
+										foreach ( $image_ids as $image_id ) {
+											?>
+											<div class="carousel-item <?php echo esc_attr( $active_class ); ?>">
+												<?php echo wp_get_attachment_image( $image_id, 'large', false, array( 'class' => 'd-block w-100 classified-carousel-img' ) ); ?>
 											</div>
-										<?php
+											<?php
 											$active_class = '';
 										}
 										?>
@@ -51,7 +57,7 @@ get_header();
 										<span class="carousel-control-next-icon" aria-hidden="false"></span>
 									</button>
 								</div>
-							<?php
+								<?php
 							}
 							?>
 
@@ -67,17 +73,17 @@ get_header();
 								<?php the_content(); ?>
 							</div>
 							<?php
-							if (! empty($price)) {
-							?>
+							if ( ! empty( $price ) ) {
+								?>
 								<div class="price">
-									<p><strong>Precio: </strong><?php echo ('USD' === $currency) ? 'USD$ ' : 'ARS$ ', esc_html($price); ?> </p>
+									<p><strong>Precio: </strong><?php echo ( 'USD' === $currency ) ? 'USD$ ' : 'ARS$ ', esc_html( $price ); ?> </p>
 								</div>
 							<?php } ?>
 
 							<div class="categories">
 								<strong>Categorías: </strong>
 								<?php
-								display_post_terms(get_the_ID(), 'classified_category');
+								display_post_terms( get_the_ID(), 'classified_category' );
 								?>
 							</div>
 
@@ -91,17 +97,17 @@ get_header();
 									</span>
 									<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="heading-1" data-bs-parent="#inquiryAccordion">
 										<div class="accordion-body">
-											<?php require plugin_dir_path(__FILE__) . 'includes/single/inquiry-form.php'; ?>
+											<?php require plugin_dir_path( __FILE__ ) . 'includes/single/inquiry-form.php'; ?>
 										</div>
 									</div>
 								</div>
 							</div>
 
 							<!-- WhatsApp button -->
-							<?php if (! empty($whatsapp_number)) : ?>
-								<a href="https://wa.me/<?php echo esc_attr($whatsapp_number); ?>" target="_blank" class="btn btn-whatsapp">
+							<?php if ( ! empty( $whatsapp_number ) ) : ?>
+								<a href="https://wa.me/<?php echo esc_attr( $whatsapp_number ); ?>" target="_blank" class="btn btn-whatsapp">
 									<span>Contactar por WhatsApp</span>
-									<img src="<?php echo plugin_dir_url(__FILE__) ?>src/img/whatsapp.svg" alt="WhatsApp Icon" class="whatsapp-icon">
+									<img src="<?php echo plugin_dir_url( __FILE__ ); ?>src/img/whatsapp.svg" alt="WhatsApp Icon" class="whatsapp-icon">
 								</a>
 
 							<?php endif; ?>
@@ -110,7 +116,7 @@ get_header();
 					</div><!-- .row -->
 				</div><!-- .container -->
 			</section>
-	<?php
+			<?php
 		endwhile;
 	endif;
 	?>

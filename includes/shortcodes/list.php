@@ -22,6 +22,13 @@ function display_classifieds_list() {
 
 	if ( $query->have_posts() ) :
 		?>
+
+		<div class="classifieds-cta-container listing-page">
+			<a href="https://ganaderiaynegocios.com/clasificados/carga-un-clasificado/" class="classifieds-cta">
+				CARGÁ UN CLASIFICADO 
+			</a>
+		</div>
+		
 		<div class="classified-list-wrapper">
 			<div class="container">
 				<div class="row">

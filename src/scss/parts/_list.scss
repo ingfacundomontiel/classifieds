@@ -1,3 +1,35 @@
+.classifieds-cta-container {
+
+    &.listing-page {
+        @media screen and (min-width: 644px) {
+            float: right;
+            margin-top: -68px;
+        }
+
+        .classifieds-cta {
+            background-color: #4c9127;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: $border-radius;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all ease-in-out 0.5s;
+            margin: 0;
+            font-weight: 600;
+
+            @media screen and (min-width: 644px) {
+                box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+            }
+
+            &:hover {
+                background-color: #98c01f;
+                color: rgba(0, 0, 0, .75);
+            }
+        }
+    }
+}
+
 .classified-list-wrapper {
     .container {
         margin-left: 0;
