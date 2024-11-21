@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The template for displaying a single Classified post.
  *
@@ -25,12 +24,6 @@ get_header();
 			<section class="block the-content">
 				<div class="container">
 					<div class="row">
-
-						<div class="classifieds-cta-container">
-							<a href="https://ganaderiaynegocios.com/clasificados/" class="classifieds-cta">
-								VOLVER A CLASIFICADOS
-							</a>
-						</div>
 
 						<div class="col-12 col-lg-5 carousel-col">
 							<?php
@@ -111,6 +104,12 @@ get_header();
 								</a>
 
 							<?php endif; ?>
+
+							<div class="classifieds-cta-container">
+								<a href="https://ganaderiaynegocios.com/clasificados/" class="classifieds-cta">
+									VOLVER A CLASIFICADOS
+								</a>
+							</div>
 
 						</div> <!-- .content-col -->
 					</div><!-- .row -->

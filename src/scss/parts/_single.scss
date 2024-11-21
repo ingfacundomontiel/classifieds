@@ -3,27 +3,6 @@
 
     .the-content {
 
-        .classifieds-cta-container {
-            margin-bottom: 30px;
-
-            .classifieds-cta {
-                background-color: #4c9127;
-                color: #fff;
-                padding: 10px 20px;
-                border: none;
-                border-radius: $border-radius;
-                cursor: pointer;
-                text-decoration: none;
-                transition: all ease-in-out 0.5s;
-                font-weight: 600;
-
-                &:hover {
-                    background-color: #98c01f;
-                    color: rgba(0, 0, 0, .75);
-                }
-            }
-        }
-
         .carousel-col {
 
             #classifiedCarousel {
@@ -142,6 +121,27 @@
 
                 .whatsapp-icon {
                     max-width: 25px;
+                }
+            }
+
+            .classifieds-cta-container {
+                margin-bottom: 30px;
+    
+                .classifieds-cta {
+                    background-color: #4c9127;
+                    color: #fff;
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: $border-radius;
+                    cursor: pointer;
+                    text-decoration: none;
+                    transition: all ease-in-out 0.5s;
+                    font-weight: 600;
+    
+                    &:hover {
+                        background-color: #98c01f;
+                        color: rgba(0, 0, 0, .75);
+                    }
                 }
             }
         }
