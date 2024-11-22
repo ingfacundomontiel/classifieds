@@ -28,33 +28,39 @@ get_header();
 						<div class="col-12 col-lg-5 carousel-col">
 							<?php
 							if ( ! empty( $image_ids ) ) {
-								?>
-								<div id="classifiedCarousel" class="carousel slide" data-bs-ride="carousel">
-									<div class="carousel-inner">
-										<?php
-										$active_class = 'active';
-										foreach ( $image_ids as $image_id ) {
-											?>
-											<div class="carousel-item <?php echo esc_attr( $active_class ); ?>">
-												<?php echo wp_get_attachment_image( $image_id, 'large', false, array( 'class' => 'd-block w-100 classified-carousel-img' ) ); ?>
-											</div>
+								if ( count( $image_ids ) > 1 ) {
+									// Generate the carousel if there is more than one image.
+									?>
+									<div id="classifiedCarousel" class="carousel slide" data-bs-ride="carousel">
+										<div class="carousel-inner">
 											<?php
-											$active_class = '';
-										}
-										?>
+											$active_class = 'active';
+											foreach ( $image_ids as $image_id ) {
+												?>
+												<div class="carousel-item <?php echo esc_attr( $active_class ); ?>">
+													<?php echo wp_get_attachment_image( $image_id, 'large', false, array( 'class' => 'classified-carousel-img' ) ); ?>
+												</div>
+												<?php
+												$active_class = ''; // Remove active class after the first item.
+											}
+											?>
+										</div>
+										<button class="carousel-control-prev" type="button" data-bs-target="#classifiedCarousel" data-bs-slide="prev">
+											<span class="carousel-control-prev-icon" aria-hidden="false"></span>
+										</button>
+										<button class="carousel-control-next" type="button" data-bs-target="#classifiedCarousel" data-bs-slide="next">
+											<span class="carousel-control-next-icon" aria-hidden="false"></span>
+										</button>
 									</div>
-									<button class="carousel-control-prev" type="button" data-bs-target="#classifiedCarousel" data-bs-slide="prev">
-										<span class="carousel-control-prev-icon" aria-hidden="false"></span>
-									</button>
-									<button class="carousel-control-next" type="button" data-bs-target="#classifiedCarousel" data-bs-slide="next">
-										<span class="carousel-control-next-icon" aria-hidden="false"></span>
-									</button>
-								</div>
-								<?php
+									<?php
+								} else {
+									// Show the single image without a carousel.
+									echo wp_get_attachment_image( $image_ids[0], 'large', false, array( 'class' => 'classified-carousel-img single-image' ) );
+								}
 							}
 							?>
-
 						</div><!-- .carousel-col -->
+
 
 						<div class="col-12 col-lg-6 content-col">
 							<h1>
