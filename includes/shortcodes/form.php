@@ -132,11 +132,11 @@ function display_classified_form() {
 			</div>
 		</div>
 
-		<div class="classified-form-group">
+		<div class="classified-form-group submit-and-loader">
 			<input type="submit" name="submit_classified" value="Enviar Clasificado">
+			<div id="loader"></div>
 		</div>
 
-		<div id="loader"></div>
 	</form>
 
 	<?php

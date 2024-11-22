@@ -208,7 +208,7 @@ function handle_classified_submission() {
 	$subject  = 'Nuevo Clasificado - Pendiente de moderación';
 	$message  = 'Se ha enviado un nuevo Clasificado.' . "\n\n";
 	$message .= 'Título: ' . sanitize_text_field( wp_unslash( $_POST['classified_title'] ) ) . "\n";
-	$message .= 'Correo electrónico del vendedor: ' . sanitize_email( wp_unslash( $_POST['classified_email'] ) ) . "\n";
+	$message .= 'Correo electrónico del vendedor: ' . sanitize_email( wp_unslash( $_POST['classified_email'] ) ) . "\n\n";
 	$message .= 'Para revisar y aprobar el Clasificado, visita el panel de administración de WordPress.' . "\n\n";
 	$headers  = array( 'Content-Type: text/plain; charset=UTF-8' );
 
