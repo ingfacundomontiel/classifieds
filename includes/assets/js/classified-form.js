@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     submitButton.disabled = true;
                     submitButton.value = 'Enviado';
                 } else {
-                    responseMessage.textContent = 'Hubo un error: ' + data.data;
+                    responseMessage.innerHTML = 'Hubo uno o más errores al enviar el Clasificado:<br> ' + data.data;
                     responseMessage.style.color = 'red';
                     submitButton.disabled = false;
                 }

@@ -11,6 +11,11 @@
  * @return void
  */
 function handle_classified_submission() {
+	// Check if the rate limit has been exceeded.
+	if ( is_rate_limited() ) {
+		wp_send_json_error( 'Has alcanzado el límite de envíos de Clasificados. Por favor, intentalo de nuevo en una hora.' );
+	}
+
 	// Check if the nonce is set and valid.
 	if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ), 'submit_classified' ) ) {
 		wp_send_json_error( 'Security error: form could not be processed.' );
@@ -41,41 +46,41 @@ function handle_classified_submission() {
 
 	// Validate required fields.
 	if ( ! isset( $_POST['classified_title'] ) || empty( $_POST['classified_title'] ) ) {
-		$form_errors[] = 'The title is required.';
+		$form_errors[] = 'Debes ingresar un título.';
 	}
 
 	if ( ! isset( $_POST['classified_description'] ) || empty( $_POST['classified_description'] ) ) {
-		$form_errors[] = 'The description is required.';
+		$form_errors[] = 'Debes ingresar una descripción.';
 	}
 
 	$classified_price = isset( $_POST['classified_price'] ) ? floatval( wp_unslash( $_POST['classified_price'] ) ) : '0';
-	if ( empty( $classified_price ) ) {
-		$form_errors[] = 'The price must be greater than zero.';
+	if ( empty( $classified_price ) || $classified_price <= 0 ) {
+		$form_errors[] = 'El precio debe ser mayor a cero.';
 	}
 
 	$allowed_currencies  = array( 'ARS', 'USD' );
 	$classified_currency = isset( $_POST['classified_currency'] ) ? sanitize_text_field( wp_unslash( $_POST['classified_currency'] ) ) : 'ARS';
 	if ( ! in_array( $classified_currency, $allowed_currencies, true ) ) {
-		$form_errors[] = 'Invalid currency selected.';
+		$form_errors[] = 'Debes seleccionar una moneda.';
 	}
 
 	$allowed_conditions   = array( 'Nuevo', 'Usado' );
 	$classified_condition = isset( $_POST['classified_condition'] ) ? sanitize_text_field( wp_unslash( $_POST['classified_condition'] ) ) : 'Nuevo';
 	if ( ! in_array( $classified_condition, $allowed_conditions, true ) ) {
-		$form_errors[] = 'Invalid product condition selected.';
+		$form_errors[] = 'Debes especificar la condición del Clasificado.';
 	}
 
 	if ( ! isset( $_POST['classified_location'] ) || empty( $_POST['classified_location'] ) ) {
-		$form_errors[] = 'The location is required.';
+		$form_errors[] = 'La Localidad es requerida.';
 	}
 
 	$categories = isset( $_POST['classified_category'] ) ? array_map( 'intval', wp_unslash( $_POST['classified_category'] ) ) : array();
 	if ( empty( $categories ) ) {
-		$form_errors[] = 'You must select at least one category.';
+		$form_errors[] = 'Debes seleccionar al menos una Categoría de la lista.';
 	} else {
 		foreach ( $categories as $category_id ) {
 			if ( ! term_exists( $category_id, 'classified_category' ) ) {
-				$form_errors[] = 'Invalid category selected.';
+				$form_errors[] = 'Categoría seleccionada inválida.';
 				break;
 			}
 		}
@@ -83,23 +88,24 @@ function handle_classified_submission() {
 
 	$classified_email = isset( $_POST['classified_email'] ) ? sanitize_email( wp_unslash( $_POST['classified_email'] ) ) : '';
 	if ( ! is_email( $classified_email ) ) {
-		$form_errors[] = 'The provided email address is not valid.';
+		$form_errors[] = 'La dirección de correo electrónico no es válida.';
 	}
 
 	if ( ! isset( $_POST['classified_user_type'] ) || empty( $_POST['classified_user_type'] ) ) {
-		$form_errors[] = 'You must select if you are a Producer or a Business.';
+		$form_errors[] = 'Debes seleccionar si eres un Productor o Comercio.';
 	}
 
-	if ( ! isset( $_POST['classified_whatsapp'] ) || ! empty( $_POST['classified_whatsapp'] ) ) {
-		$classified_whatsapp = sanitize_text_field( wp_unslash( $_POST['classified_whatsapp'] ) );
+	if ( isset( $_POST['classified_whatsapp'] ) && ! empty( $_POST['classified_whatsapp'] ) ) {
+		$classified_whatsapp = preg_replace( '/\D/', '', sanitize_text_field( wp_unslash( $_POST['classified_whatsapp'] ) ) ); // Remove any character that is not a number.
+
 		if ( ! preg_match( '/^\d{10,15}$/', $classified_whatsapp ) ) {
-			$form_errors[] = 'Invalid WhatsApp number format. Please enter the number without spaces or symbols.';
+			$form_errors[] = 'Formato de número de WhatsApp inválido. Por favor, revise el número ingresado.';
 		}
 	}
 
 	// Return validation errors if any.
 	if ( ! empty( $form_errors ) ) {
-		wp_send_json_error( implode( ', ', $form_errors ) );
+		wp_send_json_error( implode( '<br> ', $form_errors ) );
 	}
 
 	// Sanitize and process the classified data if no errors.
@@ -114,7 +120,7 @@ function handle_classified_submission() {
 	$classified_id = wp_insert_post( $classified_data );
 
 	if ( ! $classified_id ) {
-		wp_send_json_error( 'There was an error saving the classified.' );
+		wp_send_json_error( 'Ha habido un error creando el Clasificado.' );
 	}
 
 	// Assign the category.
@@ -157,15 +163,15 @@ function handle_classified_submission() {
 
 			// Validate file type and size.
 			if ( ! in_array( $file['type'], $allowed_mime_types, true ) ) {
-				wp_send_json_error( 'Invalid file type. Only JPG, PNG, GIF and WEBP are allowed.' );
+				wp_send_json_error( 'Tipo de archivo no válido. Sólo se permiten JPG, PNG, GIF y WEBP.' );
 			}
 
 			if ( $file['size'] > $max_file_size ) {
-				wp_send_json_error( 'One or more files exceed the maximum size of 1MB.' );
+				wp_send_json_error( 'Uno o más archivos exceden el peso máximo de 1MB.' );
 			}
 
 			if ( UPLOAD_ERR_OK !== $file['error'] ) {
-				wp_send_json_error( 'There was an error uploading one or more files.' );
+				wp_send_json_error( 'Hubo un error subiendo uno o más archivos.' );
 			}
 
 			$upload_overrides = array( 'test_form' => false );
