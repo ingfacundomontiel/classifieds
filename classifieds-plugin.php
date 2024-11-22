@@ -41,7 +41,6 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/post-types.php'; // Include
 require_once plugin_dir_path( __FILE__ ) . 'includes/taxonomies.php'; // Include the file that registers taxonomies.
 require_once plugin_dir_path( __FILE__ ) . 'includes/shortcodes.php'; // Include the file that registers shortcodes.
 
-
 // Include Functions.
 
 require_once plugin_dir_path( __FILE__ ) . 'functions/enqueue-assets.php'; // Include the file that enqueues the assets.
@@ -50,3 +49,4 @@ require_once plugin_dir_path( __FILE__ ) . 'functions/custom-template.php'; // I
 require_once plugin_dir_path( __FILE__ ) . 'functions/print-classified-categories.php'; // Include the file that prints the categories.
 require_once plugin_dir_path( __FILE__ ) . 'functions/custom-excerpt.php'; // Include the file that customizes excerpts.
 require_once plugin_dir_path( __FILE__ ) . 'functions/featured-image.php'; // Include the file that sets the featured image from the gallery.
+require_once plugin_dir_path( __FILE__ ) . 'functions/rate-limit.php'; // Include the file that checks if the current IP has reached the request limit.
