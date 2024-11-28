@@ -53,7 +53,7 @@ function display_classifieds_list() {
 											<?php
 										else :
 											?>
-											<img class="featured-image" src="<?php echo esc_url( get_template_directory_uri() . '/images/placeholder.png' ); ?>" alt="<?php the_title(); ?>">
+											<img class="featured-image" src="<?php echo esc_url( plugin_dir_url( dirname( __DIR__, 1 ) ) . 'src/img/classifieds-square.webp' ); ?>" alt="<?php the_title(); ?>">
 											<?php
 										endif;
 										?>

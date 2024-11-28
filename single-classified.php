@@ -24,7 +24,6 @@ get_header();
 			<section class="block the-content">
 				<div class="container">
 					<div class="row">
-
 						<div class="col-12 col-lg-5 carousel-col">
 							<?php
 							if ( ! empty( $image_ids ) ) {
@@ -62,7 +61,7 @@ get_header();
 						</div><!-- .carousel-col -->
 
 
-						<div class="col-12 col-lg-6 content-col">
+						<div class="col-12 <?php echo '' !== $image_ids[0] ? 'col-lg-6' : 'col-lg-12'; ?> content-col">
 							<h1>
 								<?php
 								the_title();
@@ -106,7 +105,7 @@ get_header();
 							<?php if ( ! empty( $whatsapp_number ) ) : ?>
 								<a href="https://wa.me/<?php echo esc_attr( $whatsapp_number ); ?>" target="_blank" class="btn btn-whatsapp">
 									<span>Contactar por WhatsApp</span>
-									<img src="<?php echo plugin_dir_url( __FILE__ ); ?>src/img/whatsapp.svg" alt="WhatsApp Icon" class="whatsapp-icon">
+									<img src="<?php echo esc_url( plugin_dir_url( __FILE__ ) . 'src/img/whatsapp.svg' ); ?>" alt="WhatsApp Icon" class="whatsapp-icon">
 								</a>
 
 							<?php endif; ?>
