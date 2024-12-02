@@ -119,103 +119,96 @@ function handle_classified_submission() {
 	// Insert the post.
 	$classified_id = wp_insert_post( $classified_data );
 
-	if ( ! $classified_id ) {
+	if ( ! $classified_id ) :
 		wp_send_json_error( 'Ha habido un error creando el Clasificado.' );
-	}
+	else :
 
-	// Assign the category.
-	wp_set_post_terms( $classified_id, $categories, 'classified_category' );
+		// Assign the category.
+		wp_set_post_terms( $classified_id, $categories, 'classified_category' );
 
-	// Save custom fields.
-	update_post_meta( $classified_id, '_classified_price', $classified_price );
-	update_post_meta( $classified_id, '_classified_currency', $classified_currency );
-	update_post_meta( $classified_id, '_classified_condition', $classified_condition );
-	update_post_meta( $classified_id, '_classified_location', sanitize_text_field( wp_unslash( $_POST['classified_location'] ) ) );
+		// Save custom fields.
+		update_post_meta( $classified_id, '_classified_price', $classified_price );
+		update_post_meta( $classified_id, '_classified_currency', $classified_currency );
+		update_post_meta( $classified_id, '_classified_condition', $classified_condition );
+		update_post_meta( $classified_id, '_classified_location', sanitize_text_field( wp_unslash( $_POST['classified_location'] ) ) );
 
-	// Save custom fields for Contact info.
-	update_post_meta( $classified_id, '_classified_email', $classified_email );
-	if ( isset( $classified_whatsapp ) ) {
-		update_post_meta( $classified_id, '_classified_whatsapp', $classified_whatsapp );
-	}
-	update_post_meta( $classified_id, '_classified_user_type', sanitize_text_field( wp_unslash( $_POST['classified_user_type'] ) ) );
-	update_post_meta( $classified_id, '_classified_newsletter_subscription', isset( $_POST['newsletter_subscription'] ) ? 1 : 0 );
-
-	// Handle images.
-	if ( ! empty( $_FILES['classified_images']['name'][0] ) ) {
-		$image_ids   = array();
-		$image_count = count( $_FILES['classified_images']['name'] );
-
-		if ( $image_count > 5 ) {
-			$image_count = 5;
+		// Save custom fields for Contact info.
+		update_post_meta( $classified_id, '_classified_email', $classified_email );
+		if ( isset( $classified_whatsapp ) ) {
+			update_post_meta( $classified_id, '_classified_whatsapp', $classified_whatsapp );
 		}
+		update_post_meta( $classified_id, '_classified_user_type', sanitize_text_field( wp_unslash( $_POST['classified_user_type'] ) ) );
+		update_post_meta( $classified_id, '_classified_newsletter_subscription', isset( $_POST['newsletter_subscription'] ) ? 1 : 0 );
 
-		$allowed_mime_types = array( 'image/jpeg', 'image/png', 'image/gif', 'image/webp' );
-		$max_file_size      = 1 * 1024 * 1024; // 1MB.
+		// Handle images.
+		if ( ! empty( $_FILES['classified_images']['name'][0] ) ) {
+			$image_ids   = array();
+			$image_count = count( $_FILES['classified_images']['name'] );
 
-		for ( $i = 0; $i < $image_count; $i++ ) {
-			$file = array(
-				'name'     => isset( $_FILES['classified_images']['name'][ $i ] ) ? sanitize_file_name( wp_unslash( $_FILES['classified_images']['name'][ $i ] ) ) : '',
-				'type'     => isset( $_FILES['classified_images']['type'][ $i ] ) ? sanitize_mime_type( wp_unslash( $_FILES['classified_images']['type'][ $i ] ) ) : '',
-				'tmp_name' => isset( $_FILES['classified_images']['tmp_name'][ $i ] ) ? sanitize_file_name( wp_unslash( $_FILES['classified_images']['tmp_name'][ $i ] ) ) : '',
-				'error'    => isset( $_FILES['classified_images']['error'][ $i ] ) ? intval( wp_unslash( $_FILES['classified_images']['error'][ $i ] ) ) : 0,
-				'size'     => isset( $_FILES['classified_images']['size'][ $i ] ) ? intval( wp_unslash( $_FILES['classified_images']['size'][ $i ] ) ) : 0,
-			);
-
-			// Validate file type and size.
-			if ( ! in_array( $file['type'], $allowed_mime_types, true ) ) {
-				wp_send_json_error( 'Tipo de archivo no válido. Sólo se permiten JPG, PNG, GIF y WEBP.' );
+			if ( $image_count > 5 ) {
+				$image_count = 5;
 			}
 
-			if ( $file['size'] > $max_file_size ) {
-				wp_send_json_error( 'Uno o más archivos exceden el peso máximo de 1MB.' );
-			}
+			$allowed_mime_types = array( 'image/jpeg', 'image/png', 'image/gif', 'image/webp' );
+			$max_file_size      = 1 * 1024 * 1024; // 1MB.
 
-			if ( UPLOAD_ERR_OK !== $file['error'] ) {
-				wp_send_json_error( 'Hubo un error subiendo uno o más archivos.' );
-			}
-
-			$upload_overrides = array( 'test_form' => false );
-			$movefile         = wp_handle_upload( $file, $upload_overrides );
-
-			if ( $movefile && ! isset( $movefile['error'] ) ) {
-				$attachment = array(
-					'post_mime_type' => $movefile['type'],
-					'post_title'     => sanitize_file_name( $movefile['file'] ),
-					'post_content'   => '',
-					'post_status'    => 'inherit',
+			for ( $i = 0; $i < $image_count; $i++ ) {
+				$file = array(
+					'name'     => isset( $_FILES['classified_images']['name'][ $i ] ) ? sanitize_file_name( wp_unslash( $_FILES['classified_images']['name'][ $i ] ) ) : '',
+					'type'     => isset( $_FILES['classified_images']['type'][ $i ] ) ? sanitize_mime_type( wp_unslash( $_FILES['classified_images']['type'][ $i ] ) ) : '',
+					'tmp_name' => isset( $_FILES['classified_images']['tmp_name'][ $i ] ) ? sanitize_file_name( wp_unslash( $_FILES['classified_images']['tmp_name'][ $i ] ) ) : '',
+					'error'    => isset( $_FILES['classified_images']['error'][ $i ] ) ? intval( wp_unslash( $_FILES['classified_images']['error'][ $i ] ) ) : 0,
+					'size'     => isset( $_FILES['classified_images']['size'][ $i ] ) ? intval( wp_unslash( $_FILES['classified_images']['size'][ $i ] ) ) : 0,
 				);
 
-				$attachment_id = wp_insert_attachment( $attachment, $movefile['file'], $classified_id );
-				require_once ABSPATH . 'wp-admin/includes/image.php';
-				$attach_data = wp_generate_attachment_metadata( $attachment_id, $movefile['file'] );
-				wp_update_attachment_metadata( $attachment_id, $attach_data );
-				$image_ids[] = $attachment_id;
+				// Validate file type and size.
+				if ( ! in_array( $file['type'], $allowed_mime_types, true ) ) {
+					wp_send_json_error( 'Tipo de archivo no válido. Sólo se permiten JPG, PNG, GIF y WEBP.' );
+				}
+
+				if ( $file['size'] > $max_file_size ) {
+					wp_send_json_error( 'Uno o más archivos exceden el peso máximo de 1MB.' );
+				}
+
+				if ( UPLOAD_ERR_OK !== $file['error'] ) {
+					wp_send_json_error( 'Hubo un error subiendo uno o más archivos.' );
+				}
+
+				$upload_overrides = array( 'test_form' => false );
+				$movefile         = wp_handle_upload( $file, $upload_overrides );
+
+				if ( $movefile && ! isset( $movefile['error'] ) ) {
+					$attachment = array(
+						'post_mime_type' => $movefile['type'],
+						'post_title'     => sanitize_file_name( $movefile['file'] ),
+						'post_content'   => '',
+						'post_status'    => 'inherit',
+					);
+
+					$attachment_id = wp_insert_attachment( $attachment, $movefile['file'], $classified_id );
+					require_once ABSPATH . 'wp-admin/includes/image.php';
+					$attach_data = wp_generate_attachment_metadata( $attachment_id, $movefile['file'] );
+					wp_update_attachment_metadata( $attachment_id, $attach_data );
+					$image_ids[] = $attachment_id;
+				}
+			}
+
+			if ( ! empty( $image_ids ) ) {
+				update_post_meta( $classified_id, '_classified_images', $image_ids );
 			}
 		}
 
-		if ( ! empty( $image_ids ) ) {
-			update_post_meta( $classified_id, '_classified_images', $image_ids );
-		}
-	}
+		// Send notification emails.
 
-	// Send notification email.
-	$to = array(
-		'comunicpractica@gmail.com',
-		'ingfacundomontiel@gmail.com',
-		'info@ganaderiaynegocios.com',
-	);
+		// Notify administrators.
+		notify_admin_of_new_classified( $classified_id );
 
-	$subject  = 'Nuevo Clasificado - Pendiente de moderación';
-	$message  = 'Se ha enviado un nuevo Clasificado.' . "\n\n";
-	$message .= 'Título: ' . sanitize_text_field( wp_unslash( $_POST['classified_title'] ) ) . "\n";
-	$message .= 'Correo electrónico del vendedor: ' . sanitize_email( wp_unslash( $_POST['classified_email'] ) ) . "\n\n";
-	$message .= 'Para revisar y aprobar el Clasificado, visita el panel de administración de WordPress.' . "\n\n";
-	$headers  = array( 'Content-Type: text/plain; charset=UTF-8' );
+		// Notify user.
+		notify_user_of_submission( $classified_id );
 
-	wp_mail( $to, $subject, $message, $headers );
-
-	// Respond with success.
-	wp_send_json_success();
+		// Respond with success.
+		wp_send_json_success();
+	endif;
 }
 
 add_action( 'wp_ajax_submit_classified', 'handle_classified_submission' );

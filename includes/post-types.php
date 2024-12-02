@@ -1,4 +1,14 @@
 <?php
+/**
+ * Post Types for Classifieds Plugin
+ *
+ * @package Classifieds
+ */
+
+/**
+ *
+ * Function to create a CPT for Classifieds.
+ */
 function create_classifieds_post_type() {
 	$labels = array(
 		'name'               => _x( 'Clasificados', 'post type general name', 'your-plugin-textdomain' ),
@@ -32,7 +42,7 @@ function create_classifieds_post_type() {
 add_action( 'init', 'create_classifieds_post_type' );
 
 
-// Add custom fields to Classifieds
+// Add custom fields to Classifieds.
 
 require plugin_dir_path( __FILE__ ) . 'meta-boxes/contact-info.php';
 
