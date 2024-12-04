@@ -115,7 +115,7 @@ function notify_user_of_publication( $new_status, $old_status, $post ) {
 				</p>
 				<p>Gracias por utilizar nuestro servicio.</p>
 				<p style="font-size: 12px; color: #7f8c8d;">
-					Si tienes alguna pregunta, no dudes en contactarnos.
+					Si tienes alguna pregunta, no dudes en contactarnos a info@ganaderiaynegocios.com
 				</p>
 				<img src="https://ganaderiaynegocios.com/wp-content/uploads/2021/03/ganaderia-y-negocios-logo-header.png" alt="Ganadería y Negocios" style="max-width: 200px;">
 			</body>
