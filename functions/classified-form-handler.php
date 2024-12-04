@@ -196,6 +196,9 @@ function handle_classified_submission() {
 			if ( ! empty( $image_ids ) ) {
 				update_post_meta( $classified_id, '_classified_images', $image_ids );
 			}
+
+			// Initialize user notification flag.
+			update_post_meta( $classified_id, '_user_notified_of_publication', false );
 		}
 
 		// Send notification emails.
